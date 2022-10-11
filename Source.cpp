@@ -43,72 +43,117 @@ int tirarDado();
 int quienEmpieza();
 int efectoPosicion(int casillaActual);
 int efectoTiradas(int casillaActual, int numeroDeTiradas);
-
 int main() {
-	
+	srand(time(NULL));
+
 	return 0;
 }
 
 bool esOca(int casilla) {
-
+	bool aux = false;
+	bool sumar4 = true;
+	for (int i = 0; i <= casilla; i += sumar4 ? 4 : 5) {
+		if (casilla == i) {
+			aux = true;
+		}
+		sumar4 = !sumar4;
+	}
+	return aux;
 }
 
 bool esPuente(int casilla) {
-	
+	return casilla == CASILLA_PUENTE_1 || casilla == CASILLA_PUENTE_2;
 }
 
 bool esDados(int casilla) {
-	
+	return casilla == CASILLA_DADOS_1 || casilla == CASILLA_DADOS_2;
 }
 
 bool esLaberinto(int casilla) {
-	
+	return casilla == CASILLA_LABERINTO;
 }
 
 bool esMuerte(int casilla) {
-	
+	return casilla == CASILLA_MUERTE;
 }
 
 bool esPosada(int casilla) {
-	
+	return casilla == CASILLA_POSADA;
 }
 
 bool esPrision(int casilla) {
-	
+	return casilla == CASILLA_PRISION;
 }
 
 bool esPozo(int casilla) {
-	
+	return casilla == CASILLA_POZO;
 }
 
 bool esMeta(int casilla) {
-	
+	return casilla >= NUM_CASILLAS;
 }
 
 int siguienteOca(int casilla) {
-	
+	int aux;
+	bool sumar4 = true;
+	for (int i = 0; i <= casilla; i += sumar4 ? 4 : 5) {
+		if (casilla == i) {
+			aux = i;
+		}
+		sumar4 = !sumar4;
+	}
+	aux += sumar4 ? 4 : 5;
+	return aux;
 }
 
 int siguientePuente(int casilla) {
-	
+	return casilla == CASILLA_PUENTE_1 ? CASILLA_PUENTE_1 : CASILLA_PUENTE_2;
 }
 
 int siguienteDado(int casilla) {
-	
+	return casilla == CASILLA_DADOS_1 ? CASILLA_DADOS_1 : CASILLA_DADOS_2;
 }
 
 int siguienteLaberinto(int casilla) {
-	
+	return casilla - PENALIZACION_LABERINTO;
 }
 
 int siguienteMuerte(int casilla) {
-	
+	return CASILLA_PARTIDA;
 }
 
 int tirarDado() {
-	
+	return DADO_MINIMO + rand() % (DADO_MAXIMO + 1 - DADO_MINIMO);
 }
 
 int quienEmpieza() {
-	
+	return NUMERO_JUGADORES_MIN + rand() % (NUMERO_JUGADORES_MAX + 1 - NUMERO_JUGADORES_MIN);
+}
+
+int efectoPosicion(int casillaActual) {
+	int casillaNueva;
+	if (esOca(casillaActual)) {
+		casillaNueva = siguienteOca(casillaActual);
+		//tirar dados
+	}
+	else if (esPuente(casillaActual)) {
+		casillaNueva = siguientePuente(casillaActual);
+		//tirar dados
+	}
+	else if (esDados(casillaActual)) {
+		casillaNueva = siguienteDado(casillaActual);
+		//tirar dados
+	}
+	else if (esLaberinto(casillaActual)) {
+		//laberinto 
+	}
+	else if (esPosada(casillaActual)) {
+		//posada
+	}
+	else if (esPozo(casillaActual)) {
+		//pozo
+	}
+	else if (esMeta(casillaActual)) {
+		//meta
+	}
 }
