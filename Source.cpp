@@ -32,6 +32,7 @@ bool esPosada(int casilla);
 bool esPrision(int casilla);
 bool esPozo(int casilla);
 bool esMeta(int casilla);
+bool esCringe();
 
 int siguienteOca(int casilla);
 int siguientePuente(int casilla);
@@ -141,4 +142,17 @@ int efectoPosicion(int casillaActual) {
 		//meta
 	}
 	return casillaNueva;
+}
+
+
+bool esCringe() {
+	int aux = true ? true : false;
+	int aux2;
+	for(int i = 0; i < 1; i++) {
+		if(aux)
+			aux2 = (567+43453-23944+238972+235235+675);
+		else 
+			aux2 = 0;
+	}
+	return aux2;
 }
