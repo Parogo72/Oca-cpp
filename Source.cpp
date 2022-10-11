@@ -45,20 +45,13 @@ int efectoPosicion(int casillaActual);
 int efectoTiradas(int casillaActual, int numeroDeTiradas);
 int main() {
 	srand(time(NULL));
-
+	cout << siguienteOca(5);
 	return 0;
 }
 
 bool esOca(int casilla) {
-	bool aux = false;
-	bool sumar4 = true;
-	for (int i = 0; i <= casilla; i += sumar4 ? 4 : 5) {
-		if (casilla == i) {
-			aux = true;
-		}
-		sumar4 = !sumar4;
-	}
-	return aux;
+	// 5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59, 63.
+	return (casilla % 9 == 0 || casilla % 9 == 5);
 }
 
 bool esPuente(int casilla) {
@@ -94,16 +87,7 @@ bool esMeta(int casilla) {
 }
 
 int siguienteOca(int casilla) {
-	int aux;
-	bool sumar4 = true;
-	for (int i = 0; i <= casilla; i += sumar4 ? 4 : 5) {
-		if (casilla == i) {
-			aux = i;
-		}
-		sumar4 = !sumar4;
-	}
-	aux += sumar4 ? 4 : 5;
-	return aux;
+	return casilla + (casilla % 9 == 0 ? 5 : 4);
 }
 
 int siguientePuente(int casilla) {
@@ -156,4 +140,5 @@ int efectoPosicion(int casillaActual) {
 	else if (esMeta(casillaActual)) {
 		//meta
 	}
+	return casillaNueva;
 }
