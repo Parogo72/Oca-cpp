@@ -78,9 +78,6 @@ int main() {
 			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
 		}
-		if (tiradasContrario - 1 > 0) {
-			tiradasContrario++; //tiradas contrario = 2 en la primera run
-		}
 		tiradasPrincipal++;
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
@@ -98,7 +95,9 @@ int main() {
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
 			}
-			cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+			if (tiradasContrario = 1) {
+				cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+			}
 		}
 	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
