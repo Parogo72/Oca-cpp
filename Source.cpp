@@ -22,7 +22,7 @@ const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUMERO_JUGADORES_MIN = 1;
 const int NUMERO_JUGADORES_MAX = 2;
-const bool MODO_DEBUGS = false;
+const bool MODO_DEBUGS = true;
 
 bool esOca(int casilla);
 bool esPuente(int casilla);
@@ -88,10 +88,9 @@ int main() {
 				tiradasContrario++;
 			}
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
-			cout << tiradasPrincipal << " " << tiradasContrario << endl;
 		}
 		if (casillaPrincipal >= NUM_CASILLAS) {
-			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
+			cout << endl << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
 		else {
 			if (turno == 1) {
@@ -189,8 +188,12 @@ int quienEmpieza() {
 }
 
 int efectoPosicion(int casillaActual) {
-	int casillaNueva = casillaActual;
-	if (esOca(casillaActual)) {
+	int casillaNueva;
+
+	if (casillaActual >= NUM_CASILLAS) {
+		casillaNueva = casillaActual;
+	} 
+	else if (esOca(casillaActual)) {
 		casillaNueva = siguienteOca(casillaActual);
 		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
 		cout << "VUELVES A TIRAR" << endl;
@@ -229,7 +232,9 @@ int efectoPosicion(int casillaActual) {
 		cout << "HAS CAIDO EN LA MUERTE" << endl;
 		cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
 	}
-	
+	else {
+		casillaNueva = casillaActual;
+	}
 	return casillaNueva;
 }
 
