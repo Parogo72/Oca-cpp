@@ -15,13 +15,14 @@ const int CASILLA_POZO = 31;
 const int CASILLA_LABERINTO = 42;
 const int CASILLA_MUERTE = 58;
 const int TURNOS_POSADA = 1;
-const int TURNOS_PRISION = 1;
-const int TURNOS_PUENTE = 3;
+const int TURNOS_PRISION = 2;
+const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUMERO_JUGADORES_MIN = 1;
 const int NUMERO_JUGADORES_MAX = 2;
+const bool MODO_DEBUGS = false;
 
 bool esOca(int casilla);
 bool esPuente(int casilla);
@@ -40,6 +41,7 @@ int siguienteLaberinto(int casilla);
 int siguienteMuerte(int casilla);
 
 int tirarDado();
+int tirarDadoManual();
 int quienEmpieza();
 int efectoPosicion(int casillaActual);
 int efectoTiradas(int casillaActual, int numeroDeTiradas);
@@ -107,6 +109,10 @@ int siguienteMuerte(int casilla) {
 
 int tirarDado() {
 	
+}
+
+int tirarDadoManual() {
+
 }
 
 int quienEmpieza() {
