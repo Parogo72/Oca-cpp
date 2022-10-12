@@ -90,7 +90,6 @@ int main() {
 			
 
 		}
-		tiradasPrincipal++;
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
