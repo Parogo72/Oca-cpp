@@ -69,7 +69,7 @@ int main() {
 			tiradasContrario = tiradasJugador1;
 		}
 		//(tengas tiradas o el contrario no tenga tiradas) y no hayas llegado a la meta
-		while ((tiradasPrincipal > 0 || tiradasContrario < 1) && casillaPrincipal < NUM_CASILLAS) {
+		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 			cout << tiradasPrincipal << " " << tiradasContrario << endl;
 			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
@@ -84,6 +84,7 @@ int main() {
 			cout << tiradasPrincipal << " " << tiradasContrario << endl;
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
 		}
+
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
@@ -100,9 +101,7 @@ int main() {
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
 			}
-			if (tiradasContrario = 1) {
-				cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
-			}
+			cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
 		}
 	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
