@@ -57,39 +57,33 @@ int main() {
 	int tiradasPrincipal;
 	int tiradasContrario;
 	cout << "**** EMPIEZA EL JUGADOR: " << turno << "****" << endl;
-	if (turno == 1) {
-		casillaPrincipal = casillaJugador1;
-	}
-	else {
-		casillaPrincipal = casillaJugador2;
-	}
-	while (casillaPrincipal < NUM_CASILLAS) {
+	do {
 		if (turno == 1) {
 			casillaPrincipal = casillaJugador1;
 			tiradasPrincipal = tiradasJugador1;
 			tiradasContrario = tiradasJugador2;
 		}
-		else {
+		else if (turno == 2) {
 			casillaPrincipal = casillaJugador2;
 			tiradasPrincipal = tiradasJugador2;
 			tiradasContrario = tiradasJugador1;
 		}
-
-		while ((tiradasPrincipal > 0 || tiradasContrario < 1) && casillaPrincipal < NUM_CASILLAS) {
+		//(tengas tiradas o el contrario no tenga tiradas) y no hayas llegado a la meta
+		while (tiradasPrincipal > 0 && casillaPrincipal < NUM_CASILLAS) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
-			casillaPrincipal += MODO_DEBUGS ? tirarDadoManual() : tirarDado();
-
-			if (tiradasPrincipal > 0) {
-				tiradasPrincipal--;
-			}
-			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal);
-			if (tiradasContrario < 1 && tiradasPrincipal < 1) {
-				tiradasContrario++;
-			}
+			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
+			cout << "PASAS A LA CASILLA " << casillaPrincipal << endl;
+			// se te quita la posibilidad a tirar
+			tiradasPrincipal--;
+			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
 		}
+		if (tiradasContrario - 1 > 0) {
+			tiradasContrario++; //tiradas contrario = 2 en la primera run
+		}
+		tiradasPrincipal++;
 		if (casillaPrincipal >= NUM_CASILLAS) {
-			cout << endl << "------ GANA EL JUGADOR " << turno << " ------" << endl;
+			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
 		else {
 			if (turno == 1) {
@@ -98,16 +92,15 @@ int main() {
 				tiradasJugador2 = tiradasContrario;
 				turno = 2;
 			}
-			else {
+			else if (turno == 2) {
 				casillaJugador2 = casillaPrincipal;
 				tiradasJugador2 = tiradasPrincipal;
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
-
 			}
 			cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
 		}
-	}
+	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
 }
 
@@ -187,14 +180,8 @@ int quienEmpieza() {
 }
 
 int efectoPosicion(int casillaActual) {
-	int casillaNueva;
-
-	cout << "PASAS A LA CASILLA " << casillaActual << endl;
-
-	if (casillaActual >= NUM_CASILLAS) {
-		casillaNueva = casillaActual;
-	}
-	else if (esOca(casillaActual)) {
+	int casillaNueva = casillaActual;
+	if (esOca(casillaActual)) {
 		casillaNueva = siguienteOca(casillaActual);
 		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
 		cout << "VUELVES A TIRAR" << endl;
@@ -233,31 +220,28 @@ int efectoPosicion(int casillaActual) {
 		cout << "HAS CAIDO EN LA MUERTE" << endl;
 		cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
 	}
-	else {
-		casillaNueva = casillaActual;
-	}
+
 	return casillaNueva;
 }
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
-	int tiradasNueva = numeroDeTiradas;
 	if (esOca(casillaActual)) {
-		tiradasNueva++;
+		numeroDeTiradas++;
 	}
 	else if (esPuente(casillaActual)) {
-		tiradasNueva++;
+		numeroDeTiradas++;
 	}
 	else if (esDados(casillaActual)) {
-		tiradasNueva++;
+		numeroDeTiradas++;
 	}
 	else if (esPosada(casillaActual)) {
-		tiradasNueva -= TURNOS_POSADA;
+		numeroDeTiradas -= TURNOS_POSADA;
 	}
 	else if (esPrision(casillaActual)) {
-		tiradasNueva -= TURNOS_PRISION;
+		numeroDeTiradas -= TURNOS_PRISION;
 	}
 	else if (esPozo(casillaActual)) {
-		tiradasNueva -= TURNOS_POZO;
+		numeroDeTiradas -= TURNOS_POZO;
 	}
-	return tiradasNueva;
+	return numeroDeTiradas;
 }
