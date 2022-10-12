@@ -78,7 +78,6 @@ int main() {
 		while ((tiradasPrincipal > 0 || tiradasContrario < 1) && casillaPrincipal < NUM_CASILLAS) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 			casillaPrincipal += MODO_DEBUGS ? tirarDadoManual() : tirarDado();
-			cout << "PASAS A LA CASILLA " << casillaPrincipal << endl;
 			
 			if (tiradasPrincipal > 0) {
 				tiradasPrincipal--;
@@ -189,6 +188,8 @@ int quienEmpieza() {
 
 int efectoPosicion(int casillaActual) {
 	int casillaNueva;
+
+	cout << "PASAS A LA CASILLA " << casillaActual << endl;
 
 	if (casillaActual >= NUM_CASILLAS) {
 		casillaNueva = casillaActual;
