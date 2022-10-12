@@ -72,7 +72,6 @@ int main() {
 		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
 			if (tiradasPrincipal > 0) {
 				cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
-				cout << tiradasPrincipal << " " << tiradasContrario << endl;
 				casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
 				// se te quita la posibilidad a tirar
 				if (tiradasPrincipal > 0) {
@@ -82,7 +81,6 @@ int main() {
 				if (tiradasContrario < 1 && tiradasPrincipal < 1) {
 					tiradasContrario++;
 				}
-				cout << tiradasPrincipal << " " << tiradasContrario << endl;
 				casillaPrincipal = efectoPosicion(casillaPrincipal);
 			}
 			else {
@@ -90,8 +88,9 @@ int main() {
 				tiradasContrario++;
 			}
 			
-		}
 
+		}
+		tiradasPrincipal++;
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
@@ -101,14 +100,20 @@ int main() {
 				tiradasJugador1 = tiradasPrincipal;
 				tiradasJugador2 = tiradasContrario;
 				turno = 2;
+				if (tiradasJugador2 == 1) {
+					cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+				}
 			}
 			else if (turno == 2) {
 				casillaJugador2 = casillaPrincipal;
 				tiradasJugador2 = tiradasPrincipal;
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
+				if (tiradasJugador1 == 1) {
+					cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+				}
 			}
-			cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+
 		}
 	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
@@ -190,14 +195,8 @@ int quienEmpieza() {
 }
 
 int efectoPosicion(int casillaActual) {
-	int casillaNueva;
-
-	cout << "PASAS A LA CASILLA " << casillaActual << endl;
-
-	if (casillaActual >= NUM_CASILLAS) {
-		casillaNueva = casillaActual;
-	}
-	else if (esOca(casillaActual)) {
+	int casillaNueva = casillaActual;
+	if (esOca(casillaActual)) {
 		casillaNueva = siguienteOca(casillaActual);
 		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
 		cout << "VUELVES A TIRAR" << endl;
@@ -220,17 +219,14 @@ int efectoPosicion(int casillaActual) {
 		cout << "RETROCEDES A LA CASILLA " << casillaNueva << endl;
 	}
 	else if (esPosada(casillaActual)) {
-		casillaNueva = casillaActual;
 		cout << "HAS CAIDO EN LA POSADA" << endl;
 		cout << "PIERDES " << TURNOS_POSADA << " TURNOS" << endl;
 	}
 	else if (esPrision(casillaActual)) {
-		casillaNueva = casillaActual;
 		cout << "HAS CAIDO EN LA PRISION" << endl;
 		cout << "PIERDES " << TURNOS_PRISION << " TURNOS" << endl;
 	}
 	else if (esPozo(casillaActual)) {
-		casillaNueva = casillaActual;
 		cout << "HAS CAIDO EN EL POZO" << endl;
 		cout << "PIERDES " << TURNOS_POZO << " TURNOS" << endl;
 	}
@@ -238,9 +234,6 @@ int efectoPosicion(int casillaActual) {
 		casillaNueva = siguienteMuerte(casillaActual);
 		cout << "HAS CAIDO EN LA MUERTE" << endl;
 		cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
-	}
-	else {
-		casillaNueva = casillaActual;
 	}
 
 	return casillaNueva;
