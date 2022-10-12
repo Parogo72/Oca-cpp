@@ -100,7 +100,9 @@ int main() {
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
 			}
-			cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+			if (tiradasContrario = 1) {
+				cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+			}
 		}
 	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
