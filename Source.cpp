@@ -78,7 +78,7 @@ int main() {
 		while ((tiradasPrincipal > 0 || tiradasContrario < 1) && casillaPrincipal < NUM_CASILLAS) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 			casillaPrincipal += MODO_DEBUGS ? tirarDadoManual() : tirarDado();
-			
+
 			if (tiradasPrincipal > 0) {
 				tiradasPrincipal--;
 			}
@@ -193,7 +193,7 @@ int efectoPosicion(int casillaActual) {
 
 	if (casillaActual >= NUM_CASILLAS) {
 		casillaNueva = casillaActual;
-	} 
+	}
 	else if (esOca(casillaActual)) {
 		casillaNueva = siguienteOca(casillaActual);
 		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
