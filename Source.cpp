@@ -88,16 +88,20 @@ int main() {
 				tiradasJugador1 = tiradasPrincipal;
 				tiradasJugador2 = tiradasContrario;
 				turno = 2;
+				if (tiradasJugador2 == 1) {
+					cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+				}
 			}
 			else if (turno == 2) {
 				casillaJugador2 = casillaPrincipal;
 				tiradasJugador2 = tiradasPrincipal;
 				tiradasJugador1 = tiradasContrario;
 				turno = 1;
+				if (tiradasJugador1 == 1) {
+					cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
+				}
 			}
-			if (tiradasContrario = 1) {
-				cout << endl << "TURNO PARA EL JUGADOR " << turno << endl;
-			}
+
 		}
 	} while (casillaPrincipal < NUM_CASILLAS);
 	return 0;
