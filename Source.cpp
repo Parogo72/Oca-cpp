@@ -70,17 +70,26 @@ int main() {
 		}
 		//(tengas tiradas o el contrario no tenga tiradas) y no hayas llegado a la meta
 		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
-			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
-			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
-			// se te quita la posibilidad a tirar
 			if (tiradasPrincipal > 0) {
-				tiradasPrincipal--;
+				cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
+				cout << tiradasPrincipal << " " << tiradasContrario << endl;
+				casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
+				// se te quita la posibilidad a tirar
+				if (tiradasPrincipal > 0) {
+					tiradasPrincipal--;
+				}
+				tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
+				if (tiradasContrario < 1 && tiradasPrincipal < 1) {
+					tiradasContrario++;
+				}
+				cout << tiradasPrincipal << " " << tiradasContrario << endl;
+				casillaPrincipal = efectoPosicion(casillaPrincipal);
 			}
-			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
-			if (tiradasContrario < 1 && tiradasPrincipal < 1) {
+			else {
+				tiradasPrincipal++;
 				tiradasContrario++;
 			}
-			casillaPrincipal = efectoPosicion(casillaPrincipal);
+			
 		}
 
 		if (casillaPrincipal >= NUM_CASILLAS) {
