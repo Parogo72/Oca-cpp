@@ -91,11 +91,11 @@ int siguienteOca(int casilla) {
 }
 
 int siguientePuente(int casilla) {
-	return casilla == CASILLA_PUENTE_1 ? CASILLA_PUENTE_1 : CASILLA_PUENTE_2;
+	return casilla == CASILLA_PUENTE_1 ? CASILLA_PUENTE_2 : CASILLA_PUENTE_1; //si es true, tiene que devolver la de puente2 no la de puente1 otra vez.
 }
 
 int siguienteDado(int casilla) {
-	return casilla == CASILLA_DADOS_1 ? CASILLA_DADOS_1 : CASILLA_DADOS_2;
+	return casilla == CASILLA_DADOS_1 ? CASILLA_DADOS_2 : CASILLA_DADOS_1; //lo mismo aqui. Ambos no van solo hacia delante, tambien pueden hacerte ir hacia atras.
 }
 
 int siguienteLaberinto(int casilla) {
@@ -129,7 +129,7 @@ int efectoPosicion(int casillaActual) {
 		//tirar dados
 	}
 	else if (esLaberinto(casillaActual)) {
-		//laberinto 
+		//laberinto
 	}
 	else if (esPosada(casillaActual)) {
 		//posada
