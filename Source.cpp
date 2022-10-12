@@ -22,7 +22,7 @@ const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUMERO_JUGADORES_MIN = 1;
 const int NUMERO_JUGADORES_MAX = 2;
-const bool MODO_DEBUGS = true;
+const bool MODO_DEBUGS = false;
 
 bool esOca(int casilla);
 bool esPuente(int casilla);
@@ -84,10 +84,11 @@ int main() {
 				tiradasPrincipal--;
 			}
 			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal);
-			if (tiradasContrario < 1 && tiradasPrincipal == 0) {
+			if (tiradasContrario < 1 && tiradasPrincipal < 1) {
 				tiradasContrario++;
 			}
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
+			cout << tiradasPrincipal << " " << tiradasContrario << endl;
 		}
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
