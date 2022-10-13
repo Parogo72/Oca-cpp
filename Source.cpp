@@ -68,15 +68,13 @@ int main() {
 			tiradasPrincipal = tiradasJugador2;
 			tiradasContrario = tiradasJugador1;
 		}
-		//(tengas tiradas o el contrario no tenga tiradas) y no hayas llegado a la meta
+		//(tengas mas tiradas que el contrario) y no hayas llegado a la meta
 		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
-			if (tiradasPrincipal > 0) {
+			if (tiradasPrincipal > 0) { //si tienes tiradas, entonces puedes tirar
 				cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 				casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
-				// se te quita la posibilidad a tirar
-				if (tiradasPrincipal > 0) {
-					tiradasPrincipal--;
-				}
+				// se te quita la posibilidad a tirar 
+				tiradasPrincipal--;
 				tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 				if (tiradasContrario < 1 && tiradasPrincipal < 1) {
 					tiradasContrario++;
@@ -187,14 +185,11 @@ int quienEmpieza() {
 }
 
 int efectoPosicion(int casillaActual) {
-	int casillaNueva;
+	int casillaNueva = casillaActual;
 
 	cout << "PASAS A LA CASILLA " << casillaActual << endl;
 
-	if (casillaActual >= NUM_CASILLAS) {
-		casillaNueva = casillaActual;
-	}
-	else if (esOca(casillaActual)) {
+	if (esOca(casillaActual)) {
 		casillaNueva = siguienteOca(casillaActual);
 		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
 		cout << "VUELVES A TIRAR" << endl;
@@ -235,9 +230,6 @@ int efectoPosicion(int casillaActual) {
 		casillaNueva = siguienteMuerte(casillaActual);
 		cout << "HAS CAIDO EN LA MUERTE" << endl;
 		cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
-	}
-	else {
-		casillaNueva = casillaActual;
 	}
 
 	return casillaNueva;
