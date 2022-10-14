@@ -74,7 +74,6 @@ int main() {
 
 		cout << "CASILLA ACTUAL: " << casillaAux << endl;
 		casillaAux += (MODO_DEBUGS ? tirarDadoManual() : tirarDado()); // Tiramos dado manual o normal
-		tiradasAux--; // Restamos la tirada usada
 		casillaAux = efectoPosicion(casillaAux);
 		tiradasAux = efectoTiradas(casillaAux, tiradasAux);
 		// Nos deshacemos de la variable auxiliar
@@ -266,5 +265,6 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	else if (numeroDeTiradas < numeroDeTiradasNuevas) {
 		cout << "VUELVES A TIRAR" << endl;
 	}
+	numeroDeTiradasNuevas--; // Restamos la tirada usada
 	return numeroDeTiradasNuevas;
 }
