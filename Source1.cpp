@@ -72,7 +72,6 @@ int main() {
 		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
-			cout << "PASAS A LA CASILLA " << casillaPrincipal << endl;
 			// se te quita la posibilidad a tirar
 			tiradasPrincipal--;
 			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
@@ -184,73 +183,74 @@ int quienEmpieza() {
 
 int efectoPosicion(int casillaActual) {
 	int casillaNueva = casillaActual;
-
 	cout << "PASAS A LA CASILLA " << casillaActual << endl;
-
-	if (casillaActual >= NUM_CASILLAS) {
-		casillaNueva = casillaActual;
+	if (!esMeta(casillaActual)) {
+		if (esOca(casillaActual)) {
+			casillaNueva = siguienteOca(casillaActual);
+			cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
+		}
+		else if (esPuente(casillaActual)) {
+			casillaNueva = siguientePuente(casillaActual);
+			cout << "DE PUENTE EN PUENTE Y TIRO PORQUE ME LLEVA LA CORRIENTE" << endl;
+			cout << "SALTAS AL PUENTE EN LA CASILLA: " << casillaNueva << endl;
+		}
+		else if (esDados(casillaActual)) {
+			casillaNueva = siguienteDado(casillaActual);
+			cout << "DE DADO A DADO Y TIRO PORQUE ME HA TOCADO " << endl;
+			cout << "SALTAS AL SIGUIENTE DADO EN LA CASILLA: " << casillaNueva << endl;
+		}
+		else if (esLaberinto(casillaActual)) {
+			casillaNueva = siguienteLaberinto(casillaActual);
+			cout << "HAS CAIDO EN EL LABERINTO" << endl;
+			cout << "RETROCEDES A LA CASILLA " << casillaNueva << endl;
+		}
+		else if (esPosada(casillaActual)) {
+			casillaNueva = casillaActual;
+			cout << "HAS CAIDO EN LA POSADA" << endl;
+		}
+		else if (esPrision(casillaActual)) {
+			casillaNueva = casillaActual;
+			cout << "HAS CAIDO EN LA PRISION" << endl;
+		}
+		else if (esPozo(casillaActual)) {
+			casillaNueva = casillaActual;
+			cout << "HAS CAIDO EN EL POZO" << endl;
+		}
+		else if (esMuerte(casillaActual)) {
+			casillaNueva = siguienteMuerte(casillaActual);
+			cout << "HAS CAIDO EN LA MUERTE" << endl;
+			cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
+		}
 	}
-	if (esOca(casillaActual)) {
-		casillaNueva = siguienteOca(casillaActual);
-		cout << "SALTAS A LA SIGUIENTE OCA EN LA CASILLA: " << casillaNueva << endl;
-		cout << "VUELVES A TIRAR" << endl;
-	}
-	else if (esPuente(casillaActual)) {
-		casillaNueva = siguientePuente(casillaActual);
-		cout << "DE PUENTE EN PUENTE Y TIRO PORQUE ME LLEVA LA CORRIENTE" << endl;
-		cout << "SALTAS AL PUENTE EN LA CASILLA: " << casillaNueva << endl;
-		cout << "VUELVES A TIRAR" << endl;
-	}
-	else if (esDados(casillaActual)) {
-		casillaNueva = siguienteDado(casillaActual);
-		cout << "DE DADO A DADO Y TIRO PORQUE ME HA TOCADO " << endl;
-		cout << "SALTAS AL SIGUIENTE DADO EN LA CASILLA: " << casillaNueva << endl;
-		cout << "VUELVES A TIRAR" << endl;
-	}
-	else if (esLaberinto(casillaActual)) {
-		casillaNueva = siguienteLaberinto(casillaActual);
-		cout << "HAS CAIDO EN EL LABERINTO" << endl;
-		cout << "RETROCEDES A LA CASILLA " << casillaNueva << endl;
-	}
-	else if (esPosada(casillaActual)) {
-		cout << "HAS CAIDO EN LA POSADA" << endl;
-		cout << "PIERDES " << TURNOS_POSADA << " TURNOS" << endl;
-	}
-	else if (esPrision(casillaActual)) {
-		cout << "HAS CAIDO EN LA PRISION" << endl;
-		cout << "PIERDES " << TURNOS_PRISION << " TURNOS" << endl;
-	}
-	else if (esPozo(casillaActual)) {
-		cout << "HAS CAIDO EN EL POZO" << endl;
-		cout << "PIERDES " << TURNOS_POZO << " TURNOS" << endl;
-	}
-	else if (esMuerte(casillaActual)) {
-		casillaNueva = siguienteMuerte(casillaActual);
-		cout << "HAS CAIDO EN LA MUERTE" << endl;
-		cout << "VUELVES A LA CASILLA " << casillaNueva << endl;
-	}
-
 	return casillaNueva;
 }
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
+	int numeroDeTiradasNuevas = numeroDeTiradas;
 	if (esOca(casillaActual)) {
-		numeroDeTiradas++;
+		numeroDeTiradasNuevas++;
 	}
 	else if (esPuente(casillaActual)) {
-		numeroDeTiradas++;
+		numeroDeTiradasNuevas++;
 	}
 	else if (esDados(casillaActual)) {
-		numeroDeTiradas++;
+		numeroDeTiradasNuevas++;
 	}
 	else if (esPosada(casillaActual)) {
-		numeroDeTiradas -= TURNOS_POSADA;
+		numeroDeTiradasNuevas -= TURNOS_POSADA;
 	}
 	else if (esPrision(casillaActual)) {
-		numeroDeTiradas -= TURNOS_PRISION;
+		numeroDeTiradasNuevas -= TURNOS_PRISION;
 	}
 	else if (esPozo(casillaActual)) {
-		numeroDeTiradas -= TURNOS_POZO;
+		numeroDeTiradasNuevas -= TURNOS_POZO;
 	}
-	return numeroDeTiradas;
+	if (numeroDeTiradas > numeroDeTiradasNuevas) {
+		cout << "PIERDES " << -numeroDeTiradasNuevas << " TURNOS" << endl;
+	}
+	else if (numeroDeTiradas < numeroDeTiradasNuevas) {
+		cout << "VUELVES A TIRAR" << endl;
+	}
+	return numeroDeTiradasNuevas;
 }
+
