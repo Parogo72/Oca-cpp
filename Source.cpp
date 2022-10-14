@@ -59,8 +59,8 @@ int main() {
 	
 	cout << "**** EMPIEZA EL JUGADOR: " << jugadorActivo << "****" << endl;
 	do {
-		// Si ambos no tienen tiradas, se aÃ±aden tiros
-		if (tiradasPrincipal < 0 && tiradasContrario < 0) {
+		// Si ambos no tienen tiradas, se añaden tiros
+		if (tiradasPrincipal < 1 && tiradasContrario < 1) {
 			tiradasPrincipal++;
 			tiradasContrario++;
 		}
@@ -86,8 +86,11 @@ int main() {
 			casillaContrario = casillaAux;
 			tiradasContrario = tiradasAux;
 		}
-		// Si aun estamos en el comienzo de la ronda y el contrario tiene mÃ¡s tiradas (Nosotros tenemos 0 o turnos negativos), cambiamos turno
-		if (comienzoRonda && tiradasPrincipal < tiradasContrario) {
+		if (esMeta(casillaPrincipal)) {
+			cout << "------ GANA EL JUGADOR " << jugadorActivo << " ------" << endl;
+		}
+		// Si aun estamos en el comienzo de la ronda y el contrario tiene más tiradas (Nosotros tenemos 0 o turnos negativos), cambiamos turno
+		else if (comienzoRonda && tiradasPrincipal < tiradasContrario) {
 			jugadorActivo = 2;
 			comienzoRonda = !comienzoRonda;
 			if (!MODO_DEBUGS) {
@@ -98,7 +101,7 @@ int main() {
 			}
 			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
-		// Si estamos al final de la ronda y tenemos mÃ¡s o igual numero de tiradas, cambiamos de turno (0 y 0, o penalizaciÃ³n del contrario)
+		// Si estamos al final de la ronda y tenemos más o igual numero de tiradas, cambiamos de turno (0 y 0, o penalización del contrario)
 		else if (!comienzoRonda && tiradasContrario <= tiradasPrincipal) {
 			jugadorActivo = 1;
 			comienzoRonda = !comienzoRonda;
@@ -235,7 +238,10 @@ int efectoPosicion(int casillaActual) {
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
-	if (esOca(casillaActual)) {
+	if (esMeta(casillaActual)) {
+		numeroDeTiradasNuevas = numeroDeTiradas;
+	} 
+	else if (esOca(casillaActual)) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPuente(casillaActual)) {
@@ -253,6 +259,7 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	else if (esPozo(casillaActual)) {
 		numeroDeTiradasNuevas -= TURNOS_POZO;
 	}
+
 	if (numeroDeTiradas > numeroDeTiradasNuevas) {
 		cout << "PIERDES " << -numeroDeTiradasNuevas << " TURNOS" << endl;
 	}
