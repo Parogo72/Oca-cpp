@@ -74,10 +74,14 @@ int main() {
 			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
 			// se te quita la posibilidad a tirar
 			tiradasPrincipal--;
-			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 			casillaPrincipal = efectoPosicion(casillaPrincipal);
+			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 		}
 		tiradasPrincipal++;
+		while ((tiradasPrincipal < 0 && tiradasContrario < 0) && casillaPrincipal < NUM_CASILLAS) {
+			tiradasPrincipal++;
+			tiradasContrario++;
+		}
 		if (casillaPrincipal >= NUM_CASILLAS) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
