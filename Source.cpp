@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-using namespace std;
+using std::cout;
+using std::cin;
+using std::endl;
 
 const int NUM_CASILLAS = 63;
 const int CASILLA_PARTIDA = 1;
@@ -56,7 +58,7 @@ int main() {
 	int tiradasContrario = 1;
 	// Esta variable nos deja saber si estamos al comienzo de un turno. Es decir, si empieza el jugador 2, si estamos en el jugador 2.
 	bool comienzoRonda = true;
-	
+
 	cout << "**** EMPIEZA EL JUGADOR: " << jugadorActivo << "****" << endl;
 	do {
 		// Si ambos no tienen tiradas, se a�aden tiros
@@ -113,7 +115,7 @@ int main() {
 			}
 			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
-	} while (!esMeta(casillaPrincipal) && !esMeta(casillaContrario));
+	} while (!esMeta(casillaPrincipal));
 	return 0;
 }
 
@@ -240,8 +242,8 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
 	if (esMeta(casillaActual)) {
 		numeroDeTiradasNuevas = numeroDeTiradas;
-	} 
-	else if (esOca(casillaActual) || esPuente(casillaActual) || esDados(casillaActual) ) {
+	}
+	else if (esOca(casillaActual) || esPuente(casillaActual) || esDados(casillaActual)) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPosada(casillaActual)) {
