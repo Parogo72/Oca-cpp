@@ -233,13 +233,8 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
 	if (esMeta(casillaActual)) {
 		numeroDeTiradasNuevas = numeroDeTiradas;
-	}else if (esOca(casillaActual)) {
-		numeroDeTiradasNuevas++;
 	}
-	else if (esPuente(casillaActual)) {
-		numeroDeTiradasNuevas++;
-	}
-	else if (esDados(casillaActual)) {
+	else if (esOca(casillaActual) || esPuente(casillaActual) || esDados(casillaActual) ) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPosada(casillaActual)) {
