@@ -46,8 +46,6 @@ int quienEmpieza();
 int efectoPosicion(int casillaActual);
 int efectoTiradas(int casillaActual, int numeroDeTiradas);
 
-void cambioTurno(int jugadorActivo);
-
 int main() {
 	srand(time(NULL));
 	int jugadorActivo = quienEmpieza(); // Vemos que jugador empieza. Utilizaremos esta variable para saber el numero del jugador activo
@@ -58,10 +56,10 @@ int main() {
 	int tiradasContrario = 1;
 	// Esta variable nos deja saber si estamos al comienzo de un turno. Es decir, si empieza el jugador 2, si estamos en el jugador 2.
 	bool comienzoRonda = true;
-
+	
 	cout << "**** EMPIEZA EL JUGADOR: " << jugadorActivo << "****" << endl;
 	do {
-		// Si ambos no tienen tiradas, se añaden tiros
+		// Si ambos no tienen tiradas, se aï¿½aden tiros
 		if (tiradasPrincipal < 1 && tiradasContrario < 1) {
 			tiradasPrincipal++;
 			tiradasContrario++;
@@ -76,6 +74,7 @@ int main() {
 
 		cout << "CASILLA ACTUAL: " << casillaAux << endl;
 		casillaAux += (MODO_DEBUGS ? tirarDadoManual() : tirarDado()); // Tiramos dado manual o normal
+		tiradasAux--; // Restamos la tirada usada
 		casillaAux = efectoPosicion(casillaAux);
 		tiradasAux = efectoTiradas(casillaAux, tiradasAux);
 		// Nos deshacemos de la variable auxiliar
@@ -90,17 +89,29 @@ int main() {
 		if (esMeta(casillaPrincipal)) {
 			cout << "------ GANA EL JUGADOR " << jugadorActivo << " ------" << endl;
 		}
-		// Si aun estamos en el comienzo de la ronda y el contrario tiene más tiradas (Nosotros tenemos 0 o turnos negativos), cambiamos turno
+		// Si aun estamos en el comienzo de la ronda y el contrario tiene mï¿½s tiradas (Nosotros tenemos 0 o turnos negativos), cambiamos turno
 		else if (comienzoRonda && tiradasPrincipal < tiradasContrario) {
 			jugadorActivo = 2;
 			comienzoRonda = !comienzoRonda;
-			cambioTurno(jugadorActivo);
+			if (!MODO_DEBUGS) {
+				cin.ignore();
+			}
+			else {
+				cout << endl;
+			}
+			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
-		// Si estamos al final de la ronda y tenemos más o igual numero de tiradas, cambiamos de turno (0 y 0, o penalización del contrario)
+		// Si estamos al final de la ronda y tenemos mï¿½s o igual numero de tiradas, cambiamos de turno (0 y 0, o penalizaciï¿½n del contrario)
 		else if (!comienzoRonda && tiradasContrario <= tiradasPrincipal) {
 			jugadorActivo = 1;
 			comienzoRonda = !comienzoRonda;
-			cambioTurno(jugadorActivo);
+			if (!MODO_DEBUGS) {
+				cin.ignore();
+			}
+			else {
+				cout << endl;
+			}
+			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
 	} while (!esMeta(casillaPrincipal) && !esMeta(casillaContrario));
 	return 0;
@@ -229,7 +240,7 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
 	if (esMeta(casillaActual)) {
 		numeroDeTiradasNuevas = numeroDeTiradas;
-	}
+	} 
 	else if (esOca(casillaActual)) {
 		numeroDeTiradasNuevas++;
 	}
@@ -248,23 +259,12 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	else if (esPozo(casillaActual)) {
 		numeroDeTiradasNuevas -= TURNOS_POZO;
 	}
-	numeroDeTiradasNuevas--; // Restamos la tirada usada
-	if (numeroDeTiradasNuevas < 0) {
+
+	if (numeroDeTiradas > numeroDeTiradasNuevas) {
 		cout << "PIERDES " << -numeroDeTiradasNuevas << " TURNOS" << endl;
 	}
-	else if (numeroDeTiradasNuevas > 0) {
+	else if (numeroDeTiradas < numeroDeTiradasNuevas) {
 		cout << "VUELVES A TIRAR" << endl;
 	}
-	
 	return numeroDeTiradasNuevas;
-}
-
-void cambioTurno(int jugadorActivo) {
-	if (!MODO_DEBUGS) {
-		cin.ignore();
-	}
-	else {
-		cout << endl;
-	}
-	cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 }
