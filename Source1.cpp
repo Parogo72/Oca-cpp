@@ -231,7 +231,9 @@ int efectoPosicion(int casillaActual) {
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
-	if (esOca(casillaActual)) {
+	if (esMeta(casillaActual)) {
+		numeroDeTiradasNuevas = numeroDeTiradas;
+	}else if (esOca(casillaActual)) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPuente(casillaActual)) {
@@ -257,4 +259,3 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	}
 	return numeroDeTiradasNuevas;
 }
-
