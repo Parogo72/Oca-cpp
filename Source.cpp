@@ -1,9 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-using std::cout;
-using std::cin;
-using std::endl;
+using namespace std;
 
 const int NUM_CASILLAS = 63;
 const int CASILLA_PARTIDA = 1;
@@ -95,25 +93,13 @@ int main() {
 		else if (comienzoRonda && tiradasPrincipal < tiradasContrario) {
 			jugadorActivo = 2;
 			comienzoRonda = !comienzoRonda;
-			if (!MODO_DEBUGS) {
-				cin.ignore();
-			}
-			else {
-				cout << endl;
-			}
-			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
+			cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
 		// Si estamos al final de la ronda y tenemos m�s o igual numero de tiradas, cambiamos de turno (0 y 0, o penalizaci�n del contrario)
 		else if (!comienzoRonda && tiradasContrario <= tiradasPrincipal) {
 			jugadorActivo = 1;
 			comienzoRonda = !comienzoRonda;
-			if (!MODO_DEBUGS) {
-				cin.ignore();
-			}
-			else {
-				cout << endl;
-			}
-			cout << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
+			cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
 	} while (!esMeta(casillaPrincipal));
 	return 0;
