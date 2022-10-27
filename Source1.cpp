@@ -69,7 +69,7 @@ int main() {
 			tiradasContrario = tiradasJugador1;
 		}
 		//(tengas tiradas o el contrario no tenga tiradas) y no hayas llegado a la meta
-		while ((tiradasPrincipal >= tiradasContrario) && casillaPrincipal < NUM_CASILLAS) {
+		while ((tiradasPrincipal >= tiradasContrario) && !esMeta(casillaPrincipal)) {
 			cout << "CASILLA ACTUAL: " << casillaPrincipal << endl;
 			casillaPrincipal += (MODO_DEBUGS ? tirarDadoManual() : tirarDado());
 			// se te quita la posibilidad a tirar
@@ -78,11 +78,11 @@ int main() {
 			tiradasPrincipal = efectoTiradas(casillaPrincipal, tiradasPrincipal); //a no ser que hayas caido en una casilla especial
 		}
 		tiradasPrincipal++;
-		while ((tiradasPrincipal < 0 && tiradasContrario < 0) && casillaPrincipal < NUM_CASILLAS) {
+		while ((tiradasPrincipal < 0 && tiradasContrario < 0) && !esMeta(casillaPrincipal)) {
 			tiradasPrincipal++;
 			tiradasContrario++;
 		}
-		if (casillaPrincipal >= NUM_CASILLAS) {
+		if (esMeta(casillaPrincipal)) {
 			cout << "------ GANA EL JUGADOR " << turno << " ------" << endl;
 		}
 		else {
@@ -106,7 +106,7 @@ int main() {
 			}
 
 		}
-	} while (casillaPrincipal < NUM_CASILLAS);
+	} while (!esMeta(casillaPrincipal));
 	return 0;
 }
 
@@ -234,7 +234,7 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	if (esMeta(casillaActual)) {
 		numeroDeTiradasNuevas = numeroDeTiradas;
 	}
-	else if (esOca(casillaActual) || esPuente(casillaActual) || esDados(casillaActual) ) {
+	else if (esOca(casillaActual) || esPuente(casillaActual) || esDados(casillaActual)) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPosada(casillaActual)) {
