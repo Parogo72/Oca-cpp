@@ -89,15 +89,9 @@ int main() {
 		if (esMeta(casillaPrincipal) || esMeta(casillaContrario)) {
 			cout << "------ GANA EL JUGADOR " << jugadorActivo << " ------" << endl;
 		}
-		// Si aun estamos en el comienzo de la ronda y el contrario tiene m�s tiradas (Nosotros tenemos 0 o turnos negativos), cambiamos turno
-		else if (comienzoRonda && tiradasPrincipal < tiradasContrario) {
-			jugadorActivo = 2;
-			comienzoRonda = !comienzoRonda;
-			cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
-		}
-		// Si estamos al final de la ronda y tenemos m�s o igual numero de tiradas, cambiamos de turno (0 y 0, o penalizaci�n del contrario)
-		else if (!comienzoRonda && tiradasContrario <= tiradasPrincipal) {
-			jugadorActivo = 1;
+		// Si aun estamos en el comienzo de la ronda y el contrario tiene m�s tiradas (Nosotros tenemos 0 o turnos negativos) o si estamos al final de la ronda y tenemos m�s o igual numero de tiradas (0 y 0, o penalizaci�n del contrario), cambiamos turno
+		else if ((comienzoRonda && tiradasPrincipal < tiradasContrario) || (!comienzoRonda && tiradasContrario <= tiradasPrincipal)) {
+			jugadorActivo = jugadorActivo == 2 ? 1 : 2;
 			comienzoRonda = !comienzoRonda;
 			cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 		}
