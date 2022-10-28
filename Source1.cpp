@@ -22,7 +22,7 @@ const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUMERO_JUGADORES_MIN = 1;
 const int NUMERO_JUGADORES_MAX = 2;
-const bool MODO_DEBUGS = false;
+const bool MODO_DEBUGS = true;
 
 bool esOca(int casilla);
 bool esPuente(int casilla);
@@ -87,7 +87,7 @@ int main() {
 			tiradasContrario = tiradasAux;
 		}
 		if (esMeta(casillaPrincipal) || esMeta(casillaContrario)) {
-			cout << "------ GANA EL JUGADOR " << jugadorActivo << " ------" << endl;
+			cout << endl << "------ GANA EL JUGADOR " << jugadorActivo << " ------" << endl;
 		}
 		// Si aun estamos en el comienzo de la ronda y el contrario tiene m�s tiradas (Nosotros tenemos 0 o turnos negativos) o si estamos al final de la ronda y tenemos m�s o igual numero de tiradas (0 y 0, o penalizaci�n del contrario), cambiamos turno
 		else if ((comienzoRonda && tiradasPrincipal < tiradasContrario) || (!comienzoRonda && tiradasContrario <= tiradasPrincipal)) {
@@ -220,6 +220,7 @@ int efectoPosicion(int casillaActual) {
 
 int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 	int numeroDeTiradasNuevas = numeroDeTiradas;
+	int turnosPerdidos = 0;
 	if (esMeta(casillaActual)) {
 		numeroDeTiradasNuevas = numeroDeTiradas;
 	}
@@ -227,17 +228,17 @@ int efectoTiradas(int casillaActual, int numeroDeTiradas) {
 		numeroDeTiradasNuevas++;
 	}
 	else if (esPosada(casillaActual)) {
-		numeroDeTiradasNuevas -= TURNOS_POSADA;
+		turnosPerdidos = TURNOS_POSADA;
 	}
 	else if (esPrision(casillaActual)) {
-		numeroDeTiradasNuevas -= TURNOS_PRISION;
+		turnosPerdidos = TURNOS_PRISION;
 	}
 	else if (esPozo(casillaActual)) {
-		numeroDeTiradasNuevas -= TURNOS_POZO;
+		turnosPerdidos = TURNOS_POZO;
 	}
-
+	numeroDeTiradasNuevas -= turnosPerdidos;
 	if (numeroDeTiradas > numeroDeTiradasNuevas) {
-		cout << "PIERDES " << -numeroDeTiradasNuevas << " TURNOS" << endl;
+		cout << "PIERDES " << turnosPerdidos << " TURNOS" << endl;
 	}
 	else if (numeroDeTiradas < numeroDeTiradasNuevas) {
 		cout << "VUELVES A TIRAR" << endl;
