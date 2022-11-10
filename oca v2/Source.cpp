@@ -319,7 +319,7 @@ tCasilla stringToEnum(string str) {
 
 string enumToString(tCasilla type) {
 	string newString;
-	if (type == OCA) newString = "OCA";
+	if (type == OCA) newString = " OCA";
 	else if (type == PUENTE1) newString = "PNTE";
 	else if (type == PUENTE2) newString = "PNTE";
 	else if (type == POZO) newString = "POZO";
@@ -329,6 +329,6 @@ string enumToString(tCasilla type) {
 	else if (type == DADO2) newString = "DADO";
 	else if (type == CARCEL) newString = "CRCL";
 	else if (type == CALAVERA) newString = "MUER";
-	else if (type == NORMAL) newString = " ";
+	else if (type == NORMAL) newString = "    ";
 	return newString;
 }
