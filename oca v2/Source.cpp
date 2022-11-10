@@ -137,7 +137,6 @@ int saltaACasilla(const tTablero tablero, int casillaActual) {
 int partida(const tTablero tablero) {
 	tJugadores casillasJ, penalizacionJ;
 	int jugadorActivo = quienEmpieza();
-	int ultimoEnTirar = jugadorActivo;
 	bool ended = false;
 
 	pintaTablero(tablero, casillasJ);
