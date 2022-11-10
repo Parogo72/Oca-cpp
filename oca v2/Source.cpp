@@ -146,11 +146,8 @@ int partida(const tTablero tablero) {
 	cout << endl << "**** EMPIEZA EL JUGADOR " << jugadorActivo << " ****"<< endl;
 	while (!esMeta(casillasJ[jugadorActivo - 1])) {
 		int penalizacion = penalizacionJ[jugadorActivo - 1];
-		if (!penalizacion) {
-			if (ultimoEnTirar != jugadorActivo) {
-				cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
-			}
-			ultimoEnTirar = jugadorActivo;
+		cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl; 
+		if(!penalizacion) {
 			do {
 				tirada(tablero, casillasJ[jugadorActivo - 1], penalizacionJ[jugadorActivo - 1]);
 				pintaTablero(tablero, casillasJ);
@@ -165,6 +162,7 @@ int partida(const tTablero tablero) {
 			}
 		}
 		else {
+			cout << "... PERO NO PUEDE " << penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : " HASTA EL SIGUIENTE TURNO" << endl;
 			penalizacionJ[jugadorActivo - 1] -= 1;
 			if (jugadorActivo == NUM_JUGADORES) jugadorActivo = 1;
 			else jugadorActivo++;
