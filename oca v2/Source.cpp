@@ -13,7 +13,7 @@ const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
-const int NUM_JUGADORES = 4;
+const int NUM_JUGADORES = 2;
 const int NUM_JUGADORES_MAX = 4;
 const int NUM_FILAS = 3;
 const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
@@ -48,10 +48,15 @@ void cambioTurno(int& jugadorActivo);
 tCasilla stringToEnum(string str);
 string enumToString(tCasilla type);
 
+string lineaCompleta();
+string lineaNumCasilla(int j);
+string lineaTipoCasilla(const tTablero tablero, int j);
+string lineaJugadores(const tJugadores casillasJ, int j);
+
 int main() {
 	tTablero tablero;
 	srand(time(NULL));
-	
+
 	iniciaTablero(tablero);
 	if (cargaTablero(tablero)) {
 		int ganador = partida(tablero);
@@ -121,10 +126,10 @@ int saltaACasilla(const tTablero tablero, int casillaActual) {
 	}
 	else if (casillaTablero == DADO1) {
 		buscaCasillaAvanzando(tablero, DADO2, casillaActual);
-	} 
-	else if(casillaTablero == PUENTE1) {
+	}
+	else if (casillaTablero == PUENTE1) {
 		buscaCasillaAvanzando(tablero, PUENTE2, casillaActual);
-	} 
+	}
 	else if (casillaTablero == DADO2) {
 		buscaCasillaRetrocediendo(tablero, DADO1, casillaActual);
 	}
@@ -139,33 +144,31 @@ int partida(const tTablero tablero) {
 	int jugadorActivo = quienEmpieza();
 	bool ended = false;
 
-	pintaTablero(tablero, casillasJ);
 	iniciaJugadores(casillasJ, penalizacionJ);
+	pintaTablero(tablero, casillasJ);
 	cout << "Comienza el juego" << endl;
-	cout << endl << "**** EMPIEZA EL JUGADOR " << jugadorActivo << " ****"<< endl;
+	cout << endl << "**** EMPIEZA EL JUGADOR " << jugadorActivo << " ****" << endl;
 	while (!esMeta(casillasJ[jugadorActivo - 1])) {
 		int penalizacion = penalizacionJ[jugadorActivo - 1];
-		cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl; 
-		if(!penalizacion) {
+		if (!penalizacion) {
 			do {
 				tirada(tablero, casillasJ[jugadorActivo - 1], penalizacionJ[jugadorActivo - 1]);
 				pintaTablero(tablero, casillasJ);
 			} while (esCasillaPremio(tablero, casillasJ[jugadorActivo - 1]) && !esMeta(casillasJ[jugadorActivo - 1]));
-				
+
 			if (!esMeta(casillasJ[jugadorActivo - 1])) {
-				if (jugadorActivo == NUM_JUGADORES) jugadorActivo = 1;
-				else jugadorActivo++;
+				cambioTurno(jugadorActivo);
 			}
 			else {
 				ended = true;
 			}
 		}
 		else {
-			cout << "... PERO NO PUEDE " << penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : " HASTA EL SIGUIENTE TURNO" << endl;
+			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : " HASTA EL SIGUIENTE TURNO") << endl;
 			penalizacionJ[jugadorActivo - 1] -= 1;
-			if (jugadorActivo == NUM_JUGADORES) jugadorActivo = 1;
-			else jugadorActivo++;
+			cambioTurno(jugadorActivo);
 		}
+		cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 	}
 	cout << "** FIN DEL JUEGO **" << endl;
 	pintaTablero(tablero, casillasJ);
@@ -187,7 +190,7 @@ void buscaCasillaAvanzando(const tTablero tablero, tCasilla tipo, int& posicion)
 void buscaCasillaRetrocediendo(const tTablero tablero, tCasilla tipo, int& posicion) {
 	bool found = false;
 	int i = posicion - 1;
-	while (!found && i == 0) {
+	while (!found && i >= 0) {
 		if (tablero[i] == tipo) {
 			posicion = i;
 			found = true;
@@ -223,7 +226,8 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 		else if (casillaTablero == PUENTE1 || casillaTablero == PUENTE2) {
 			cout << "DE PUENTE EN PUENTE Y TIRO PORQUE ME LLEVA LA CORRIENTE" << endl;
 			cout << "SALTAS AL PUENTE EN LA CASILLA: " << casillaJ + 1 << endl;
-		} 
+		}
+		cout << "Y VUELVES A TIRAR" << endl;
 	}
 	else {
 		int turnosPerdidos = 0;
@@ -241,13 +245,13 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 		}
 		else if (casillaTablero == LABERINTO) {
 			casillaJ -= PENALIZACION_LABERINTO;
-			cout << "HAS CAIDO EN EL LABERINTO" << endl;
-			cout << "RETROCEDES A LA CASILLA " << casillaJ + 1 << endl;
+			cout << "CAES EN EL LABERINTO" << endl;
+			cout << "SALTAS A LA CASILLA " << casillaJ + 1 << endl;
 		}
 		else if (casillaTablero == CALAVERA) {
-			casillaJ = CASILLA_PARTIDA;
-			cout << "HAS CAIDO EN LA MUERTE" << endl;
-			cout << "VUELVES A LA CASILLA " << casillaJ + 1 << endl;
+			casillaJ = CASILLA_PARTIDA - 1;
+			cout << "MUERTE!!! VUELVES A EMPEZAR" << endl;
+			cout << "HAS CAIDO EN LA MUERTE Y VUELVES A EMPEZAR. VAS A LA CASILLA: " << casillaJ + 1 << endl;
 		}
 		if (turnosPerdidos) {
 			penalizacionJ += turnosPerdidos;
@@ -257,26 +261,45 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 }
 
 void pintaTablero(const tTablero tablero, const tJugadores casillasJ) {
-	string linea1 = "|";
+	string separador = lineaCompleta();
 	cout << endl;
-	for (int i = 1; i <= NUM_FILAS; i++) {
-		string linea2 = "|";
-		string linea3 = "|";
-		string linea4 = "|";
-		for (int j = NUM_COLUMNAS * (i - 1) + 1; j <= NUM_COLUMNAS * i; j++) {
-			tCasilla type = tablero[j - 1];
-			string tipo;
-			if (i == 1) linea1 += "====|";
-			linea2 += (j < 10 ? " 0" + to_string(j) + " " : " " + to_string(j) + " ") + "|";
-			linea3 += enumToString(type) + "|";
-			for (int k = 0; k < NUM_JUGADORES_MAX; k++) {
-				linea4 += k < NUM_JUGADORES ? (casillasJ[k] == j - 1 ? to_string(k + 1) : " ") : " ";
-			}
-			linea4 += "|";
+	for (int i = 0; i < NUM_FILAS; i++) {
+		string numCasillas = "|";
+		string tipoCasillas = "|";
+		string jugadores = "|";
+		for (int j = NUM_COLUMNAS * i + 1; j <= NUM_COLUMNAS * (i + 1); j++) {
+			numCasillas += lineaNumCasilla(j);
+			tipoCasillas += lineaTipoCasilla(tablero, j);
+			jugadores += lineaJugadores(casillasJ, j);
 		}
-		cout << linea1 << endl << linea2 << endl << linea3 << endl << linea4 << endl;
+		cout << separador << endl << numCasillas << endl << tipoCasillas << endl << jugadores << endl;
 	}
-	cout << linea1 << endl << endl;
+	cout << separador << endl << endl;
+}
+
+string lineaCompleta() {
+	string str = "|";
+	for (int i = 0; i < NUM_COLUMNAS; i++) {
+		str += "====|";
+	}
+	return str;
+}
+
+string lineaNumCasilla(int j) {
+	return (j < 10 ? " 0" + to_string(j) + " " : " " + to_string(j) + " ") + "|";;
+}
+
+string lineaTipoCasilla(const tTablero tablero, int j) {
+	return enumToString(tablero[j - 1]) + "|";
+}
+
+string lineaJugadores(const tJugadores casillasJ, int j) {
+	string str = "";
+	for (int k = 0; k < NUM_JUGADORES_MAX; k++) {
+		str += k < NUM_JUGADORES ? (casillasJ[k] == j - 1 ? to_string(k + 1) : " ") : " ";
+	}
+	str += "|";
+	return str;
 }
 
 void iniciaJugadores(tJugadores casillasJ, tJugadores penalizacionesJ) {
