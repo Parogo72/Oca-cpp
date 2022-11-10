@@ -14,6 +14,9 @@ const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUM_JUGADORES = 4;
+const int NUM_JUGADORES_MAX = 4;
+const int NUM_FILAS = 3;
+const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
 const bool MODO_DEBUGS = true;
 
 typedef enum {
@@ -259,18 +262,18 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 void pintaTablero(const tTablero tablero, const tJugadores casillasJ) {
 	string linea1 = "|";
 	cout << endl;
-	for (int i = 1; i <= 3; i++) {
+	for (int i = 1; i <= NUM_FILAS; i++) {
 		string linea2 = "|";
 		string linea3 = "|";
 		string linea4 = "|";
-		for (int j = 21 * (i - 1) + 1; j <= 21 * i; j++) {
+		for (int j = NUM_COLUMNAS * (i - 1) + 1; j <= NUM_COLUMNAS * i; j++) {
 			tCasilla type = tablero[j - 1];
 			string tipo;
 			if (i == 1) linea1 += "====|";
 			linea2 += (j < 10 ? " 0" + to_string(j) + " " : " " + to_string(j) + " ") + "|";
 			linea3 += enumToString(type) + "|";
-			for (int k = 0; k < NUM_JUGADORES; k++) {
-				linea4 += casillasJ[k] == j - 1 ? to_string(k + 1) : " ";
+			for (int k = 0; k < NUM_JUGADORES_MAX; k++) {
+				linea4 += k < NUM_JUGADORES ? (casillasJ[k] == j - 1 ? to_string(k + 1) : " ") : " ";
 			}
 			linea4 += "|";
 		}
@@ -310,12 +313,13 @@ tCasilla stringToEnum(string str) {
 	else if (str == "DADO2") newEnum = DADO2;
 	else if (str == "CARCEL") newEnum = CARCEL;
 	else if (str == "CALAVERA") newEnum = CALAVERA;
+	else if (str == "NORMAL") newEnum = NORMAL;
 	return newEnum;
 }
 
 string enumToString(tCasilla type) {
 	string newString;
-	if (type == OCA) newString = " OCA";
+	if (type == OCA) newString = "OCA";
 	else if (type == PUENTE1) newString = "PNTE";
 	else if (type == PUENTE2) newString = "PNTE";
 	else if (type == POZO) newString = "POZO";
@@ -325,6 +329,6 @@ string enumToString(tCasilla type) {
 	else if (type == DADO2) newString = "DADO";
 	else if (type == CARCEL) newString = "CRCL";
 	else if (type == CALAVERA) newString = "MUER";
-	else if (type == NORMAL) newString = "    ";
+	else if (type == NORMAL) newString = " ";
 	return newString;
 }
