@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -15,16 +15,22 @@ const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUM_JUGADORES = 2;
 const int NUM_JUGADORES_MAX = 4;
+const int CENTINELA = 0;
 const int NUM_FILAS = 3;
 const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
 const bool MODO_DEBUGS = true;
+
+const string arrayStringCasillas[] = { "    ", " OCA", "PNTE", "PNTE", "POZO", "PSDA",
+"LBRN", "DADO", "DADO", "CRCL", "MUER" };
 
 typedef enum {
 	NORMAL, OCA, PUENTE1, PUENTE2, POZO, POSADA,
 	LABERINTO, DADO1, DADO2, CARCEL, CALAVERA
 } tCasilla;
+
 typedef tCasilla tTablero[NUM_CASILLAS];
 typedef int tJugadores[NUM_JUGADORES];
+
 
 bool esCasillaPremio(const tTablero tablero, int casilla);
 bool esMeta(int casilla);
@@ -92,7 +98,7 @@ bool cargaTablero(tTablero tablero) {
 			string tipoCasilla;
 			archivo >> numCasilla;
 			archivo >> tipoCasilla;
-			if (numCasilla == 0) {
+			if (numCasilla == CENTINELA) {
 				ended = true;
 			}
 			else {
@@ -142,7 +148,6 @@ int saltaACasilla(const tTablero tablero, int casillaActual) {
 int partida(const tTablero tablero) {
 	tJugadores casillasJ, penalizacionJ;
 	int jugadorActivo = quienEmpieza();
-	bool ended = false;
 
 	iniciaJugadores(casillasJ, penalizacionJ);
 	pintaTablero(tablero, casillasJ);
@@ -158,9 +163,6 @@ int partida(const tTablero tablero) {
 
 			if (!esMeta(casillasJ[jugadorActivo - 1])) {
 				cambioTurno(jugadorActivo);
-			}
-			else {
-				ended = true;
 			}
 		}
 		else {
@@ -322,7 +324,7 @@ void cambioTurno(int& jugadorActivo) {
 }
 
 tCasilla stringToEnum(string str) {
-	tCasilla newEnum;
+	tCasilla newEnum = NORMAL;
 	if (str == "OCA") newEnum = OCA;
 	else if (str == "PUENTE1") newEnum = PUENTE1;
 	else if (str == "PUENTE2") newEnum = PUENTE2;
@@ -333,22 +335,9 @@ tCasilla stringToEnum(string str) {
 	else if (str == "DADO2") newEnum = DADO2;
 	else if (str == "CARCEL") newEnum = CARCEL;
 	else if (str == "CALAVERA") newEnum = CALAVERA;
-	else if (str == "NORMAL") newEnum = NORMAL;
 	return newEnum;
 }
 
 string enumToString(tCasilla type) {
-	string newString;
-	if (type == OCA) newString = " OCA";
-	else if (type == PUENTE1) newString = "PNTE";
-	else if (type == PUENTE2) newString = "PNTE";
-	else if (type == POZO) newString = "POZO";
-	else if (type == POSADA) newString = "PSDA";
-	else if (type == LABERINTO) newString = "LBRN";
-	else if (type == DADO1) newString = "DADO";
-	else if (type == DADO2) newString = "DADO";
-	else if (type == CARCEL) newString = "CRCL";
-	else if (type == CALAVERA) newString = "MUER";
-	else if (type == NORMAL) newString = "    ";
-	return newString;
+	return arrayStringCasillas[type];
 }
