@@ -18,7 +18,7 @@ const int NUM_JUGADORES_MAX = 4;
 const int CENTINELA = 0;
 const int NUM_FILAS = 3;
 const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
-const bool MODO_DEBUGS = true;
+const bool MODO_DEBUGS = false;
 
 const string arrayStringCasillas[] = { "    ", " OCA", "PNTE", "PNTE", "POZO", "PSDA",
 "LBRN", "DADO", "DADO", "CRCL", "MUER" };
@@ -80,7 +80,7 @@ bool esCasillaPremio(const tTablero tablero, int casilla) {
 }
 
 bool esMeta(int casilla) {
-	return casilla == NUM_CASILLAS - 1;
+	return casilla >= NUM_CASILLAS - 1;
 }
 
 bool cargaTablero(tTablero tablero) {
@@ -93,17 +93,13 @@ bool cargaTablero(tTablero tablero) {
 	archivo.open("tablero.txt");
 	opened = archivo.is_open();
 	if (opened) {
-		while (!ended) {
-			int numCasilla;
-			string tipoCasilla;
-			archivo >> numCasilla;
+		int numCasilla;
+		string tipoCasilla;
+		archivo >> numCasilla;
+		while (numCasilla != CENTINELA) {
 			archivo >> tipoCasilla;
-			if (numCasilla == CENTINELA) {
-				ended = true;
-			}
-			else {
-				tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
-			}
+			tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
+			archivo >> numCasilla;
 		}
 	}
 	return opened;
@@ -170,7 +166,6 @@ int partida(const tTablero tablero) {
 			penalizacionJ[jugadorActivo - 1] -= 1;
 			cambioTurno(jugadorActivo);
 		}
-		cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 	}
 	cout << "** FIN DEL JUEGO **" << endl;
 	pintaTablero(tablero, casillasJ);
@@ -215,7 +210,7 @@ void tirada(const tTablero tablero, int& casillaActual, int& penalizacion) {
 
 void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 	tCasilla casillaTablero = tablero[casillaJ];
-	if (esCasillaPremio(tablero, casillaJ) && !esMeta(casillaJ)) {
+	if (esCasillaPremio(tablero, casillaJ)) {
 		casillaJ = saltaACasilla(tablero, casillaJ);
 		if (casillaTablero == OCA) {
 			cout << "DE OCA A OCA Y TIRO PORQUE ME TOCA" << endl;
@@ -229,7 +224,7 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 			cout << "DE PUENTE EN PUENTE Y TIRO PORQUE ME LLEVA LA CORRIENTE" << endl;
 			cout << "SALTAS AL PUENTE EN LA CASILLA: " << casillaJ + 1 << endl;
 		}
-		cout << "Y VUELVES A TIRAR" << endl;
+		if(!esMeta(casillaJ)) cout << "Y VUELVES A TIRAR" << endl;
 	}
 	else {
 		int turnosPerdidos = 0;
@@ -321,6 +316,7 @@ void iniciaTablero(tTablero tablero) {
 void cambioTurno(int& jugadorActivo) {
 	if (jugadorActivo == NUM_JUGADORES) jugadorActivo = 1;
 	else jugadorActivo++;
+	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 }
 
 tCasilla stringToEnum(string str) {
