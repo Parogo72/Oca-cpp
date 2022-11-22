@@ -18,7 +18,6 @@ const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
 const int NUM_JUGADORES = 2;
 const int NUM_JUGADORES_MAX = 4;
-const int NUM_JUGADORES_MIN = 1;
 const int CENTINELA = 0;
 const int NUM_FILAS = 3;
 const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
@@ -214,7 +213,7 @@ int tirarDadoManual() {
 }
 
 int quienEmpieza() {
-	return NUM_JUGADORES_MIN + rand() % (NUM_JUGADORES + 1 - NUM_JUGADORES_MIN);
+	return 1 + rand() % (NUM_JUGADORES);
 }
 
 int saltaACasilla(const tTablero tablero, int casillaActual) {
