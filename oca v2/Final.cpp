@@ -143,7 +143,8 @@ tCasilla stringToEnum(string str);
    *
    * // Expected output: LBRN
    * stringToEnum(LABERINTO);
-*/string enumToString(tCasilla type);
+*/
+string enumToString(tCasilla type);
 
 //-------------------------------------------------------------------------
 // Subprogramas para pintar el tablero o mostrar informaci�n
