@@ -196,6 +196,7 @@ bool cargaTablero(tTablero tablero) {
 			tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
 			archivo >> numCasilla;
 		}
+		archivo.close();
 	}
 	return opened;
 }
