@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -163,8 +163,7 @@ int main() {
 
 	iniciaTablero(tablero);
 	if (cargaTablero(tablero)) {
-		int ganador = partida(tablero);
-		cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
+		cout << endl << "------ GANA EL JUGADOR " << partida(tablero) << " ------" << endl;
 	}
 	else {
 		cout << "No pude abrir el archivo o no existe";
