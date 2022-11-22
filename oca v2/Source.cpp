@@ -314,8 +314,7 @@ void iniciaTablero(tTablero tablero) {
 }
 
 void cambioTurno(int& jugadorActivo) {
-	if (jugadorActivo == NUM_JUGADORES) jugadorActivo = 1;
-	else jugadorActivo++;
+	jugadorActivo == NUM_JUGADORES ? jugadorActivo = 1 : jugadorActivo++;
 	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 }
 
