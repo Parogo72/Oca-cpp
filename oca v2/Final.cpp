@@ -165,7 +165,7 @@ int main() {
 		cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 	}
 	else {
-		cout << "opss";
+		cout << "No pude abrir el archivo o no existe";
 	}
 	return 0;
 }
@@ -353,8 +353,6 @@ void efectoTirada(const tTablero tablero, int& casillaJ, int& penalizacionJ) {
 }
 
 void pintaTablero(const tTablero tablero, const tJugadores casillasJ) {
-
-
 	int casillasPorFila = NUM_CASILLAS / NUM_FILAS;
 	cout << endl;
 	for (int fila = 0; fila < NUM_FILAS; fila++) {
@@ -369,37 +367,27 @@ void pintaTablero(const tTablero tablero, const tJugadores casillasJ) {
 
 
 void pintaBorde(int casillasPorFila) {
-
 	for (int i = 1; i <= casillasPorFila; i++)
 		cout << "|====";
-
 	cout << "|" << endl;
-
 }
 
 
 void pintaNumCasilla(int fila, int casillasPorFila) {
-
 	for (int i = 1; i <= casillasPorFila; i++)
 		cout << "| " << setw(2) << setfill('0') << i + fila * casillasPorFila << " ";
-
 	cout << "|" << endl;
-
 }
 
 
 void pintaTipoCasilla(const tTablero tablero, int fila, int casillasPorFila) {
-
 	for (int i = 1; i <= casillasPorFila; i++)
 		cout << "|" << setw(4) << setfill(' ') << enumToString(tablero[i - 1 + fila * casillasPorFila]);
-
 	cout << "|" << endl;
-
 }
 
 void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila) {
 	int casilla;
-
 	int blancos = NUM_JUGADORES_MAX - NUM_JUGADORES;
 	string b = "";
 	for (int i = 0; i < blancos; i++) b = b + " ";
@@ -416,7 +404,6 @@ void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila) {
 		cout << "|";
 	}
 	cout << endl;
-
 }
 
 void iniciaJugadores(tJugadores casillasJ, tJugadores penalizacionesJ) {
