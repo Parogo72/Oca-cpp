@@ -162,7 +162,8 @@ int main() {
 
 	iniciaTablero(tablero);
 	if (cargaTablero(tablero)) {
-		cout << endl << "------ GANA EL JUGADOR " << partida(tablero) << " ------" << endl;
+		int ganador = partida(tablero);
+		cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 	}
 	else {
 		cout << "No pude abrir el archivo o no existe";
