@@ -423,7 +423,7 @@ void iniciaTablero(tTablero tablero) {
 }
 
 void cambioTurno(int& jugadorActivo) {
-	jugadorActivo = (jugadorActivo + 1) % NUM_JUGADORES;
+	jugadorActivo = (jugadorActivo % NUM_JUGADORES) + 1;
 	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 }
 
