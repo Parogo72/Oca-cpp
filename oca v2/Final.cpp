@@ -16,7 +16,7 @@ const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
-const int NUM_JUGADORES = 2;
+const int NUM_JUGADORES = 4;
 const int NUM_JUGADORES_MAX = 4;
 const int CENTINELA = 0;
 const int NUM_FILAS = 3;
@@ -215,7 +215,7 @@ int tirarDadoManual() {
 }
 
 int quienEmpieza() {
-	return 1 + rand() % (NUM_JUGADORES);
+	return rand() % (NUM_JUGADORES);
 }
 
 int saltaACasilla(const tTablero tablero, int casillaActual) {
@@ -245,49 +245,49 @@ int partida(const tTablero tablero) {
 	iniciaJugadores(casillasJ, penalizacionJ);
 	pintaTablero(tablero, casillasJ);
 	cout << "Comienza el juego" << endl;
-	cout << endl << "**** EMPIEZA EL JUGADOR " << jugadorActivo << " ****" << endl;
-	while (!esMeta(casillasJ[jugadorActivo - 1])) {
-		int penalizacion = penalizacionJ[jugadorActivo - 1];
+	cout << endl << "**** EMPIEZA EL JUGADOR " << jugadorActivo + 1 << " ****" << endl;
+	while (!esMeta(casillasJ[jugadorActivo])) {
+		int penalizacion = penalizacionJ[jugadorActivo];
 		if (!penalizacion) {
 			do {
-				tirada(tablero, casillasJ[jugadorActivo - 1], penalizacionJ[jugadorActivo - 1]);
+				tirada(tablero, casillasJ[jugadorActivo], penalizacionJ[jugadorActivo]);
 				pintaTablero(tablero, casillasJ);
-			} while (esCasillaPremio(tablero, casillasJ[jugadorActivo - 1]) && !esMeta(casillasJ[jugadorActivo - 1]));
+			} while (esCasillaPremio(tablero, casillasJ[jugadorActivo]) && !esMeta(casillasJ[jugadorActivo]));
 
-			if (!esMeta(casillasJ[jugadorActivo - 1])) {
+			if (!esMeta(casillasJ[jugadorActivo])) {
 				cambioTurno(jugadorActivo);
 			}
 		}
 		else {
 			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : " HASTA EL SIGUIENTE TURNO") << endl;
-			penalizacionJ[jugadorActivo - 1] -= 1;
+			penalizacionJ[jugadorActivo] -= 1;
 			cambioTurno(jugadorActivo);
 		}
 	}
 	cout << "** FIN DEL JUEGO **" << endl;
 	pintaTablero(tablero, casillasJ);
-	return jugadorActivo;
+	return jugadorActivo + 1; // se devuelve el jugador que ha ganado la partida (ya sin tener en cuenta la posicion del array (0 -> 1, 1 -> 2, etc.))
 }
 
 void buscaCasillaAvanzando(const tTablero tablero, tCasilla tipo, int& posicion) {
-	bool found = false;
+	bool encontrado = false;
 	int i = posicion + 1;
-	while (!found && i < NUM_CASILLAS) {
+	while (!encontrado && i < NUM_CASILLAS) {
 		if (tablero[i] == tipo) {
 			posicion = i;
-			found = true;
+			encontrado = true;
 		}
 		i++;
 	}
 }
 
 void buscaCasillaRetrocediendo(const tTablero tablero, tCasilla tipo, int& posicion) {
-	bool found = false;
+	bool encontrado = false;
 	int i = posicion - 1;
-	while (!found && i >= 0) {
+	while (!encontrado && i >= 0) {
 		if (tablero[i] == tipo) {
 			posicion = i;
-			found = true;
+			encontrado = true;
 		}
 		i--;
 	}
@@ -423,8 +423,8 @@ void iniciaTablero(tTablero tablero) {
 }
 
 void cambioTurno(int& jugadorActivo) {
-	jugadorActivo = (jugadorActivo % NUM_JUGADORES) + 1;
-	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
+	jugadorActivo = (jugadorActivo + 1) % NUM_JUGADORES;
+	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo + 1 << endl;
 }
 
 tCasilla stringToEnum(string str) {
