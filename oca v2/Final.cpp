@@ -16,7 +16,7 @@ const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
-const int NUM_JUGADORES = 4;
+const int NUM_JUGADORES = 2; //Elegir aquí el numero de jugadores con los que quieres jugar.
 const int NUM_JUGADORES_MAX = 4;
 const int CENTINELA = 0;
 const int NUM_FILAS = 3;
@@ -259,7 +259,7 @@ int partida(const tTablero tablero) {
 			}
 		}
 		else {
-			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : " HASTA EL SIGUIENTE TURNO") << endl;
+			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
 			penalizacionJ[jugadorActivo] -= 1;
 			cambioTurno(jugadorActivo);
 		}
