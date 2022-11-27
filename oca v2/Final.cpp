@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -53,6 +53,18 @@ bool esCasillaPremio(const tTablero tablero, int casilla);
    * esMeta(25);
 */
 bool esMeta(int casilla);
+
+/**
+   * Comprueba si un tablero es valido o no
+   * @example
+   * // Expected output: true
+   * validarTablero([NORMAL, OCA, NORMAL, OCA]);
+   *
+   * // Expected output: false
+   * // Porque PUENTE2 no puede estar antes que PUENTE1
+   * validarTablero([PUENTE2, PUENTE1, NORMAL, OCA]);
+*/
+bool validarTablero(const tTablero tablero);
 
 /**
    * Pide por pantalla el nombre del fichero para abrir y devuelve un boolean conforme se pudo abrir o no
@@ -161,12 +173,12 @@ int main() {
 	srand(time(NULL));
 
 	iniciaTablero(tablero);
-	if (cargaTablero(tablero)) {
+	if (cargaTablero(tablero) && validarTablero(tablero)) {
 		int ganador = partida(tablero);
 		cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 	}
 	else {
-		cout << "No pude abrir el archivo o no existe";
+		cout << "No pude abrir el archivo o el tablero es invalido";
 	}
 	return 0;
 }
@@ -183,23 +195,39 @@ bool esMeta(int casilla) {
 bool cargaTablero(tTablero tablero) {
 	fstream archivo;
 	string name;
-	bool opened = false, ended = false;
+	
+	bool valido = false;
 	cout << "Que archivo quieres abrir? ";
 	cin >> name;
 	archivo.open(name);
-	opened = archivo.is_open();
-	if (opened) {
+	valido = archivo.is_open();
+	if (valido) {
 		int numCasilla;
 		string tipoCasilla;
 		archivo >> numCasilla;
 		while (numCasilla != CENTINELA) {
 			archivo >> tipoCasilla;
-			tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
+			if (numCasilla < NUM_CASILLAS) tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
 			archivo >> numCasilla;
 		}
 		archivo.close();
 	}
-	return opened;
+	return valido;
+}
+
+bool validarTablero(const tTablero tablero) {
+	bool valido = true;
+	for (int i = 0; i < NUM_CASILLAS; i++) {
+		int valInicial = i;
+		if (tablero[i] == PUENTE1) {
+			buscaCasillaAvanzando(tablero, PUENTE2, i);
+			if (valInicial == i) valido = false;
+		} else if (tablero[i] == DADO1) {
+			buscaCasillaAvanzando(tablero, DADO2, i);
+			if (valInicial == i) valido = false;
+		}
+	}
+	return valido;
 }
 
 int tirarDado() {
