@@ -108,8 +108,9 @@ void pintaBorde(int casillasPorFila);
 void pintaTipoCasilla(const tTablero tablero, int fila, int casillasPorFila);
 void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFila); // NUEVO PROTOTIPO EN V3; SUSTITUYE A  void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila);
 
-
-
+char menuTipoPartida();
+int menuNumeroPartida(const tListaPartidas listaPartidas);
+bool iniciaPartida(tEstadoPartida& estadoPartida);
 /**
    * Devuelve como enum el valor de la string proporcionada
    * @example
@@ -139,52 +140,37 @@ int main() {
 	tListaPartidas listaPartidas;
 	tEstadoPartida estadoPartida;
 
-	char opcion;
 	cargaPartidas(listaPartidas);
 
-	do {
-		cout << "Deseas jugar partida nueva o una existente (N=nueva, E=existente)? ";
-		cin >> opcion;
-	} while (toupper(opcion) != 'N' && toupper(opcion) != 'E');
-
 	int numPartida;
+	char opcion;
+	bool tableroAbierto = true;
+	if (listaPartidas.contador < 1) opcion = 'N';
+	else opcion = menuTipoPartida();
 
-	if (toupper(opcion) == 'E' && listaPartidas.contador > 0) {
-		do {
-			cout << "Los identificadores disponibles son: ";
-			for (int i = 1; i <= listaPartidas.contador; i++) {
-				cout << i << " ";
-			}
-			cout << endl << "Que partida quieres continuar? ";
-			cin >> numPartida;
-		} while (numPartida > listaPartidas.contador || numPartida < 1);
+	if (toupper(opcion) == 'E') {
+		numPartida = menuNumeroPartida(listaPartidas);
 		estadoPartida = listaPartidas.partidas[--numPartida];
-	} else if (toupper(opcion) == 'N' || listaPartidas.contador == 0) {
-		if (listaPartidas.contador == 0) cout << "No hay partidas guardadas " << endl;
-		cout << "Vas a jugar una partida nueva" << endl;
+	} else if (toupper(opcion) == 'N') {
 		numPartida = 0;
-		iniciaTablero(estadoPartida.tablero);
-		cargaTablero(estadoPartida.tablero);
-		estadoPartida.jugadorActivo = quienEmpieza();
-		iniciaJugadores(estadoPartida.jugadores);
+		tableroAbierto = iniciaPartida(estadoPartida);
 	}
-
-	if (validarTablero(estadoPartida.tablero)) {
+	if (!tableroAbierto) {
+		cout << "No pude abrir el archivo del tablero" << endl;
+	} else if (validarTablero(estadoPartida.tablero)) {
 		int ganador = partida(estadoPartida);
-		listaPartidas.partidas[numPartida] = estadoPartida;
 		if (ganador == -1) {
 			insertaNuevaPartida(listaPartidas, estadoPartida);
 			guardaPartidas(listaPartidas);
 			cout << endl << "JUEGO PARADO Y GUARDADO" << endl;
 		}
 		else {
-			eliminarPartida(listaPartidas, numPartida);
+			if(toupper(opcion) == 'E') eliminarPartida(listaPartidas, numPartida);
 			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 		}
-		
 	}
 	else {
-		cout << "No pude abrir el archivo o el tablero es invalido";
+		cout << "El tablero de la partida es invalido";
 	}
 	return 0;
 }
@@ -199,11 +185,11 @@ bool esMeta(int casilla) {
 }
 
 bool cargaTablero(tTablero tablero) {
-	fstream archivo;
+	ifstream archivo;
 	string name;
 
 	bool valido = false;
-	cout << "Que archivo quieres abrir? ";
+	cout << "Dime el nombre del archivo que contiene el tablero: ";
 	cin >> name;
 	archivo.open(name);
 	valido = archivo.is_open();
@@ -276,12 +262,12 @@ int saltaACasilla(const tTablero tablero, int casillaActual) {
 int partida(tEstadoPartida& estado) {
 	bool abandonado = false;
 	pintaTablero(estado);
-	cout << "Comienza el juego" << endl;
+	
 	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.jugadorActivo + 1 << " ****" << endl;
 	while (!esMeta(estado.jugadores[estado.jugadorActivo].posicion) && !abandonado) {
 		tEstadoJugador jugador = estado.jugadores[estado.jugadorActivo];
 		int penalizacion = jugador.penalizacion;
-		cout << penalizacion;
+
 		if (!penalizacion) {
 			do {
 				tirada(estado.tablero, jugador);
@@ -462,6 +448,36 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 
 }
 
+char menuTipoPartida() {
+	char opcion;
+	do {
+		cout << "Deseas jugar partida nueva o una existente (N=nueva, E=existente)? ";
+		cin >> opcion;
+	} while (toupper(opcion) != 'N' && toupper(opcion) != 'E');
+	return opcion;
+}
+
+int menuNumeroPartida(const tListaPartidas listaPartidas) {
+	int numPartida;
+	do {
+		cout << "Los identificadores disponibles son: ";
+		for (int i = 1; i <= listaPartidas.contador; i++) {
+			cout << i << " ";
+		}
+		cout << endl << "Que partida quieres continuar? ";
+		cin >> numPartida;
+	} while (numPartida > listaPartidas.contador || numPartida < 1);
+	return numPartida;
+}
+
+bool iniciaPartida(tEstadoPartida& estadoPartida) {
+	cout << "Vas a jugar una partida nueva" << endl;
+	iniciaTablero(estadoPartida.tablero);
+	iniciaJugadores(estadoPartida.jugadores);
+	estadoPartida.jugadorActivo = quienEmpieza();
+	return cargaTablero(estadoPartida.tablero);
+}
+
 
 void iniciaJugadores(tEstadoJugadores jugadores) {
 	for (int i = 0; i < NUM_JUGADORES; i++) {
@@ -503,12 +519,12 @@ bool cargaPartidas(tListaPartidas& partidas) {
 		}
 	}
 	else {
-		cout << "No pude abrir el archivo";
+		cout << "No pude abrir el archivo" << endl;
 	}
 	return abierto;
 }
 
-void cargaTablero(tTablero tablero, ifstream &archivo) {
+void cargaTablero(tTablero tablero, ifstream& archivo) {
 	int numCasilla;
 	string tipoCasilla;
 	archivo >> numCasilla;
@@ -519,28 +535,28 @@ void cargaTablero(tTablero tablero, ifstream &archivo) {
 	}
 }
 
-void cargaJugadores(tEstadoJugadores &jugadores, ifstream &archivo) {
+void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo) {
 	for (int i = 0; i < NUM_JUGADORES; i++) {
 		archivo >> jugadores[i].posicion;
 		archivo >> jugadores[i].penalizacion;
 	}
 }
 
-void eliminarPartida(tListaPartidas &partidas, int indice) {
+void eliminarPartida(tListaPartidas& partidas, int indice) {
 	for (int i = indice; i < partidas.contador - 1; i++) {
 		partidas.partidas[i] = partidas.partidas[i + 1];
 	}
 	partidas.contador--;
 }
 
-void insertaNuevaPartida(tListaPartidas &partidas, const tEstadoPartida & partidaOca) {
+void insertaNuevaPartida(tListaPartidas& partidas, const tEstadoPartida& partidaOca) {
 	if (partidas.contador < MAX_PARTIDAS) {
 		partidas.partidas[partidas.contador] = partidaOca;
 		partidas.contador++;
 	}
 }
 
-void guardaPartidas(const tListaPartidas &partidas) {
+void guardaPartidas(const tListaPartidas& partidas) {
 	ofstream archivo;
 	string name;
 
@@ -562,7 +578,7 @@ void guardaPartidas(const tListaPartidas &partidas) {
 	}
 }
 
-void guardaTablero(const tTablero tablero, ofstream &archivo) {
+void guardaTablero(const tTablero tablero, ofstream& archivo) {
 	for (int i = 0; i < NUM_CASILLAS - 1; i++) {
 		if(tablero[i] != NORMAL) {
 			archivo << i + 1 << " " << enumToStringCompleto(tablero[i]) << "\n";
@@ -571,7 +587,7 @@ void guardaTablero(const tTablero tablero, ofstream &archivo) {
 	archivo << 0 << "\n";
 }
 
-void guardaJugadores(const tEstadoJugadores jugadores, ofstream &archivo) {
+void guardaJugadores(const tEstadoJugadores jugadores, ofstream& archivo) {
 	for (int i = 0; i < NUM_JUGADORES; i++) {
 		archivo << jugadores[i].posicion << " " << jugadores[i].penalizacion << "\n";
 	}
