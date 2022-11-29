@@ -55,7 +55,7 @@ typedef tEstadoPartida tPartidas[MAX_PARTIDAS];
 //Estructura posibles partidas con un indicador de cuantas estan disponibles para jugar.
 struct tListaPartidas {
 	tPartidas partidas;
-	int contador;
+	int contador = 0;
 };
 
 //Tablero de juego.
@@ -213,19 +213,19 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas);
 
+void inicializacionPartidaNueva(tEstadoPartida& partidaNueva);
+
 int main() {
 	srand(time(NULL));
 	tListaPartidas partidas;
 	char seleccionPartida;
 	
 	if (cargaPartidas(partidas)) {
-		cout << "Fichero cargado correctamente. \n\n" << "Desea jugar una partida nueva o existente [N=nueva / E=existente]";
+		cout << "Fichero cargado correctamente. \n\n" << "Desea jugar una partida nueva o existente [N=nueva / E=existente] ";
 		cin >> seleccionPartida;
 		if (seleccionPartida == 'N' || seleccionPartida == 'n') {
-			cout << "Vas a jugar una partida nueva." << endl;
 			tEstadoPartida partidaNueva;
-			cout << "Indica el fichero que contiene el tablero de la oca: ";
-			partidaNueva.turno = quienEmpieza();
+			inicializacionPartidaNueva(partidaNueva);
 			int ganador = partida(partidaNueva);
 			if (ganador == PARTIDA_NO_FINALIZADA) {
 				insertaNuevaPartida(partidas, partidaNueva);
@@ -255,11 +255,24 @@ int main() {
 	return 0;
 }
 
+void inicializacionPartidaNueva(tEstadoPartida& partidaNueva) {
+	cout << "Vas a jugar una partida nueva." << endl;
+	string nombreArchivo;
+	ifstream archivo;
+	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
+	cin >> nombreArchivo;
+	archivo.open(nombreArchivo);
+	iniciaTablero(partidaNueva.tablero);
+	cargaTablero(partidaNueva.tablero, archivo);
+	iniciaJugadores(partidaNueva.estadoJug);
+	partidaNueva.turno = quienEmpieza();
+}
+
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 	int partidaSeleccionada;
 	cout << "Los identificadoes disponibles son: ";
 	for (int i = 1; i <= partidas.contador; i++) { cout << i << " "; }
-	cout << "Que partida quieres continuar? ";
+	cout << endl << "Que partida quieres continuar? ";
 	cin >> partidaSeleccionada;
 	return partidaSeleccionada;
 }
@@ -280,13 +293,7 @@ void iniciaTablero(tTablero tablero) {
 	tablero[NUM_CASILLAS - 1] = OCA;
 }
 void cargaTablero(tTablero tablero, ifstream& archivo) {
-	string name;
-	
-	bool valido = false;
-	cout << "Que archivo quieres abrir? ";
-	cin >> name;
-	archivo.open(name);
-	valido = archivo.is_open();
+	bool valido = archivo.is_open();
 	if (valido) {
 		int numCasilla;
 		string tipoCasilla;
@@ -296,7 +303,6 @@ void cargaTablero(tTablero tablero, ifstream& archivo) {
 			if (numCasilla < NUM_CASILLAS) tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
 			archivo >> numCasilla;
 		}
-		archivo.close();
 	}
 }
 
