@@ -31,6 +31,8 @@ typedef enum {
 	LABERINTO, DADO1, DADO2, CARCEL, CALAVERA
 } tCasilla;
 
+typedef tCasilla tTablero[NUM_CASILLAS];
+
 //Estructura de cada jugador.
 struct tEstadoJugador {
 	int casilla;
@@ -57,7 +59,7 @@ struct tListaPartidas {
 };
 
 //Tablero de juego.
-typedef tCasilla tTablero[NUM_CASILLAS];
+
 
 
 
@@ -185,7 +187,7 @@ tCasilla stringToEnum(string str);
    * // Expected output: LBRN
    * stringToEnum(LABERINTO);
 */
-string enumToString(tCasilla type);
+string casillaAstring(tCasilla type);
 
 bool cargaPartidas(tListaPartidas& partidas);
 void eliminarPartida(tListaPartidas& partidas, int indice);
@@ -205,7 +207,6 @@ void pintaNumCasilla(int fila, int casillasPorFila);
 void pintaBorde(int casillasPorFila);
 void pintaTipoCasilla(const tTablero tablero, int fila, int casillasPorFila);
 void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFila); // NUEVO PROTOTIPO EN V3; SUSTITUYE A  void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila);
-string casillaAstring(tCasilla casilla);
 
 //---------------------------------------------------------------------------
 
@@ -279,7 +280,6 @@ void iniciaTablero(tTablero tablero) {
 	tablero[NUM_CASILLAS - 1] = OCA;
 }
 void cargaTablero(tTablero tablero, ifstream& archivo) {
-	ifstream archivo;
 	string name;
 	
 	bool valido = false;
@@ -371,7 +371,7 @@ void guardaPartidas(const tListaPartidas& partidas) {
 void guardaTablero(const tTablero tablero, ofstream& archivo) {
 	for (int i = 0; i < NUM_CASILLAS - 1; i++) {
 		if (tablero[i] != NORMAL) {
-			archivo << i + 1 << " " << enumToString(tablero[i]) << endl;
+			archivo << i + 1 << " " << casillaAstring(tablero[i]) << endl;
 		}
 	}
 	archivo << "0" << endl;
@@ -543,7 +543,7 @@ void efectoTirada(const tTablero tablero, tEstadoJugador& estadoJug) {
 		else if (casillaTablero == CALAVERA) {
 			estadoJug.casilla = CASILLA_PARTIDA - 1;
 			cout << "MUERTE!!! VUELVES A EMPEZAR" << endl;
-			cout << "HAS CAIDO EN LA MUERTE Y VUELVES A EMPEZAR. VAS A LA CASILLA: " << casillaJ + 1 << endl;
+			cout << "HAS CAIDO EN LA MUERTE Y VUELVES A EMPEZAR. VAS A LA CASILLA: " << estadoJug.casilla + 1 << endl;
 		}
 		if (turnosPerdidos) {
 			estadoJug.penalizaciones += turnosPerdidos;
