@@ -188,6 +188,7 @@ tCasilla stringToEnum(string str);
    * stringToEnum(LABERINTO);
 */
 string casillaAstring(tCasilla type);
+string casillaAstringCompleto(tCasilla casilla);
 
 bool cargaPartidas(tListaPartidas& partidas);
 void eliminarPartida(tListaPartidas& partidas, int indice);
@@ -228,11 +229,15 @@ int main() {
 			inicializacionPartidaNueva(partidaNueva);
 			int ganador = partida(partidaNueva);
 			if (ganador == PARTIDA_NO_FINALIZADA) {
-				insertaNuevaPartida(partidas, partidaNueva);
-				guardaPartidas(partidas);
+				if (insertaNuevaPartida(partidas, partidaNueva)) {
+					guardaPartidas(partidas);
+				}
+				else {
+					cout << "No se ha podido guardar la partida porque ya se ha llegado al limite de partidas guardadas." << endl;
+				}
 			}
 			else {
-				cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
+				cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n";
 			}
 
 		}
@@ -240,7 +245,7 @@ int main() {
 			int partidaSeleccionada = seleccionadorPartidasExistentes(partidas);
 			int ganador = partida(partidas.partidas[partidaSeleccionada - 1]);
 			if (ganador != PARTIDA_NO_FINALIZADA) {
-				cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
+				cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n" << endl;
 				cout << "La partida " << partidaSeleccionada << " ha terminado. Se elimina de la lista de partidas. ";
 				eliminarPartida(partidas, partidaSeleccionada);
 
@@ -262,7 +267,6 @@ void inicializacionPartidaNueva(tEstadoPartida& partidaNueva) {
 	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
 	cin >> nombreArchivo;
 	archivo.open(nombreArchivo);
-	iniciaTablero(partidaNueva.tablero);
 	cargaTablero(partidaNueva.tablero, archivo);
 	iniciaJugadores(partidaNueva.estadoJug);
 	partidaNueva.turno = quienEmpieza();
@@ -295,6 +299,7 @@ void iniciaTablero(tTablero tablero) {
 void cargaTablero(tTablero tablero, ifstream& archivo) {
 	bool valido = archivo.is_open();
 	if (valido) {
+		iniciaTablero(tablero);
 		int numCasilla;
 		string tipoCasilla;
 		archivo >> numCasilla;
@@ -307,9 +312,11 @@ void cargaTablero(tTablero tablero, ifstream& archivo) {
 }
 
 void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo) {
+	tEstadoJugador jugadorAux;
 	for (int i = 0; i < NUM_JUGADORES; i++) {
 		archivo >> jugadores[i].casilla;
-		archivo >> jugadores[i].penalizaciones;
+		archivo >> jugadores[i].penalizaciones ;
+		jugadores[i].casilla--;
 	}
 }
 
@@ -333,8 +340,6 @@ bool cargaPartidas(tListaPartidas& partidas) {
 	}
 	return valido;
 }
-
-
 
 void eliminarPartida(tListaPartidas& partidas, int indice) {
 	for (int i = indice - 1; i < partidas.contador; i++) {
@@ -363,7 +368,7 @@ void guardaPartidas(const tListaPartidas& partidas) {
 		archivo << partidas.contador << endl;
 		for (int i = 0; i < partidas.contador; i++) {
 			guardaTablero(partidas.partidas[i].tablero, archivo);
-			archivo << partidas.partidas[i].turno;
+			archivo << partidas.partidas[i].turno << endl;
 			guardaJugadores(partidas.partidas[i].estadoJug, archivo);
 		}
 		archivo.close();
@@ -377,7 +382,7 @@ void guardaPartidas(const tListaPartidas& partidas) {
 void guardaTablero(const tTablero tablero, ofstream& archivo) {
 	for (int i = 0; i < NUM_CASILLAS - 1; i++) {
 		if (tablero[i] != NORMAL) {
-			archivo << i + 1 << " " << casillaAstring(tablero[i]) << endl;
+			archivo << i + 1 << " " << casillaAstringCompleto(tablero[i]) << endl;
 		}
 	}
 	archivo << "0" << endl;
@@ -385,11 +390,9 @@ void guardaTablero(const tTablero tablero, ofstream& archivo) {
 
 void guardaJugadores(const tEstadoJugadores jugadores, ofstream& archivo) {
 	for (int i = 0; i < NUM_JUGADORES; i++) {
-		archivo << jugadores[i].casilla << " " << jugadores[i].penalizaciones << endl;
+		archivo << jugadores[i].casilla + 1 << " " << jugadores[i].penalizaciones << endl;
 	}
 }
-
-
 
 bool esCasillaPremio(const tTablero tablero, int casilla) {
 	int casillaTablero = tablero[casilla];
@@ -459,10 +462,12 @@ int partida(tEstadoPartida& estado) {
 			estado.estadoJug[estado.turno - 1].penalizaciones -= 1;
 			cambioTurno(estado.turno);
 		}
-		if(!ganado)
-		cout << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
-		cin >> caracterContinuarPartida;
-		if (caracterContinuarPartida == 'A' || caracterContinuarPartida == 'a') continuarPartida = false;
+		if (!ganado) {
+			cout << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
+			cin >> caracterContinuarPartida;
+			if (caracterContinuarPartida == 'A' || caracterContinuarPartida == 'a') continuarPartida = false;
+		}
+		
 	}
 	if (continuarPartida) {
 		cout << "** FIN DEL JUEGO **" << endl; 
@@ -578,6 +583,79 @@ tCasilla stringToEnum(string str) {
 	return newEnum;
 }
 
+string casillaAstring(tCasilla casilla) {
+	string cadena;
+	switch (casilla) {
+	case NORMAL:
+		cadena = " ";
+		break;
+	case OCA:
+		cadena = "OCA";
+		break;
+	case DADO1:
+	case DADO2:
+		cadena = "DADO";
+		break;
+	case PUENTE1:
+	case PUENTE2:
+		cadena = "PNTE";
+		break;
+	case POSADA:
+		cadena = "PSDA";
+		break;
+	case CALAVERA:
+		cadena = "MUER";
+		break;
+	case LABERINTO:
+		cadena = "LBRN";
+		break;
+	case POZO:
+		cadena = "POZO";
+		break;
+	case CARCEL:
+		cadena = "CRCL";
+		break;
+	}
+	return cadena;
+}
+
+string casillaAstringCompleto(tCasilla casilla) {
+	string cadena;
+	switch (casilla) {
+	case OCA:
+		cadena = "OCA";
+		break;
+	case DADO1:
+		cadena = "DADO1";
+		break;
+	case DADO2:
+		cadena = "DADO2";
+		break;
+	case PUENTE1:
+		cadena = "PUENTE1";
+		break;
+	case PUENTE2:
+		cadena = "PUENTE2";
+		break;
+	case POSADA:
+		cadena = "POSADA";
+		break;
+	case CALAVERA:
+		cadena = "CALAVERA";
+		break;
+	case LABERINTO:
+		cadena = "LABERINTO";
+		break;
+	case POZO:
+		cadena = "POZO";
+		break;
+	case CARCEL:
+		cadena = "CARCEL";
+		break;
+	}
+	return cadena;
+}
+
 // Subprograma para pintar el tablero...
 void pintaTablero(const tEstadoPartida& partida) {
 
@@ -640,40 +718,4 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 	}
 	cout << endl;
 
-}
-
-string casillaAstring(tCasilla casilla) {
-	string cadena;
-	switch (casilla) {
-	case NORMAL:
-		cadena = " ";
-		break;
-	case OCA:
-		cadena = "OCA";
-		break;
-	case DADO1:
-	case DADO2:
-		cadena = "DADO";
-		break;
-	case PUENTE1:
-	case PUENTE2:
-		cadena = "PNTE";
-		break;
-	case POSADA:
-		cadena = "PSDA";
-		break;
-	case CALAVERA:
-		cadena = "MUER";
-		break;
-	case LABERINTO:
-		cadena = "LBRN";
-		break;
-	case POZO:
-		cadena = "POZO";
-		break;
-	case CARCEL:
-		cadena = "CRCL";
-		break;
-	}
-	return cadena;
 }
