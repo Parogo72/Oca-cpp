@@ -160,6 +160,7 @@ void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas & listaPartida
 void pantallaSobreescribirPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index);
 void pantallaBorrarPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index);
 void setupInicial(tAjustesPartida& ajustes);
+void guardarAjustes(tAjustesPartida ajustes);
 
 int main() {
 	srand(time(NULL));
@@ -772,6 +773,7 @@ void pantallaAjustes(tAjustesPartida& ajustes) {
 		}
 		ajustes.numJugadores = numJugadores;
 		Clear();
+		guardarAjustes(ajustes);
 		pantallaAjustes(ajustes);
 	}
 	else if (opcion == 2) {
@@ -780,9 +782,10 @@ void pantallaAjustes(tAjustesPartida& ajustes) {
 		cin >> nombreTablero;
 		cargaTablero(ajustes.tablero, nombreTablero);
 		Clear();
+		guardarAjustes(ajustes);
 		pantallaAjustes(ajustes);
 	}
-	
+	guardarAjustes(ajustes);
 }
 
 void pantallaNuevaPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas) {
@@ -953,11 +956,24 @@ void setupInicial(tAjustesPartida& ajustes) {
 	}
 	else {
 		ofstream archivo;
+		bool valido = false;
 		archivo.open("config.txt");
 		iniciaTablero(ajustes.tablero);
-		if (!cargaTablero(ajustes.tablero, ajustes.nombreTablero)) cargaTablero(ajustes.tablero);
+		valido = cargaTablero(ajustes.tablero, ajustes.nombreTablero);
+		while (!valido) {
+			valido = cargaTablero(ajustes.tablero);
+		}
 		guardaTablero(ajustes.tablero, archivo);
 		archivo << ajustes.numJugadores << endl;
 		archivo.close();
 	}
+	archivo.close();
+}
+
+void guardarAjustes(tAjustesPartida ajustes) {
+	ofstream archivo;
+	archivo.open("config.txt");
+	guardaTablero(ajustes.tablero, archivo);
+	archivo << ajustes.numJugadores << endl;
+	archivo.close();
 }
