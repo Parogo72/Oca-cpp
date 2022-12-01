@@ -86,18 +86,6 @@ bool esCasillaPremio(const tTablero tablero, int casilla);
 */
 bool esMeta(int casilla);
 
-/**
-   * Comprueba si un tablero es valido o no
-   * @example
-   * // Expected output: true
-   * validarTablero([NORMAL, OCA, NORMAL, OCA]);
-   *
-   * // Expected output: false
-   * // Porque PUENTE2 no puede estar antes que PUENTE1
-   * validarTablero([PUENTE2, PUENTE1, NORMAL, OCA]);
-*/
-bool validarTablero(const tTablero tablero);
-
 //Tirar dado al azar o modo debug.
 int tirarDado();
 int tirarDadoManual();
