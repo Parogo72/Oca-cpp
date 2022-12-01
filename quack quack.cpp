@@ -98,14 +98,8 @@ bool esMeta(int casilla);
 */
 bool validarTablero(const tTablero tablero);
 
-/**
-   * Saca un numero aleatorio entre DADO_MAXIMO y DADO_MINIMO y lo devuelve
-*/
+//Tirar dado al azar o modo debug.
 int tirarDado();
-
-/**
-   * Pide el valor del dado a tirar por pantalla y lo devuelve
-*/
 int tirarDadoManual();
 
 /**
@@ -113,91 +107,61 @@ int tirarDadoManual();
 */
 int quienEmpieza();
 
-/**
-   * Busca la casilla de avance o retroceso que ocasiona la casilla introducida y devuelve su posicion
-   * @example
-   * // Expected output: 5
-   * esCasillaPremio([OCA, NORMAL, LABERINTO, NORMAL, NORMAL, OCA], 0);
-*/
-int saltaACasilla(const tTablero tablero, int casillaActual);
 
-/**
-   * Se encarga de que la partida se lleve a cabo y devuelve el numero del jugador ganador
-*/
-int partida(tEstadoPartida& estado);
-
-/**
-   * Busca la posicion de la siguiente casilla igual a tipo empezando desde "posicion" hasta el final y cambia el valor de "posicion"
-*/
-void buscaCasillaAvanzando(const tTablero tablero, tCasilla tipo, int& posicion);
-
-/**
-   * Busca la posicion de la siguiente casilla igual a tipo empezando desde "posicion" hasta el principio y cambia el valor de "posicion"
-*/
-void buscaCasillaRetrocediendo(const tTablero tablero, tCasilla tipo, int& posicion);
-
-/**
-   * Implementa la logica de cada tirada
-   * Lanza el dado, muestra la nueva posicion y llama a efectoTirada() si es necesario
-*/
 void tirada(const tTablero tablero, tEstadoJugador& estadoJug);
-
-/**
-   * Determina el efecto de la casilla en la que ha caido el jugador y cambia los valores de casillaJ y penalizacionJ de ser necesario
-*/
 void efectoTirada(const tTablero tablero, tEstadoJugador& estadoJug);
-
-/**
-   * Inicializa los arrays de casillasJ y penalizacionesJ de acorde a NUM_JUGADORES
-*/
-void iniciaJugadores(tEstadoJugadores jugadores);
-
-/**
-   * Inicializa el tablero poniendo las casillas a NORMAL y la ultima a OCA
-*/
-void iniciaTablero(tTablero tablero);
-
-/**
-   * Se encarga de la logica para cambiar de turno
-*/
+int saltaACasilla(const tTablero tablero, int casillaActual);
+void buscaCasillaAvanzando(const tTablero tablero, tCasilla tipo, int& posicion);
+void buscaCasillaRetrocediendo(const tTablero tablero, tCasilla tipo, int& posicion);
+int partida(tEstadoPartida& estado);
 void cambioTurno(int& jugadorActivo);
+
+// Carga cada una de las partidas guardadas en el archivo a distintas posiciones de array
+void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo);
+void cargaTablero(tTablero tablero, ifstream& archivo);
+bool cargaPartidas(tListaPartidas& partidas);
+
+
+// Inicializa nuevos jugadores y nuevo tablero en posiciones default (0) y casilla NORMAL
+// y se implementa todo en la funcion inicializacionPartidaNueva de acorde a NUM_JUGADORES.
+void iniciaJugadores(tEstadoJugadores jugadores);
+void iniciaTablero(tTablero tablero);
+void inicializacionPartidaNueva(tEstadoPartida& partidaNueva);
+
+
 
 /**
    * Devuelve como enum el valor de la string proporcionada
    * @example
    * // Expected output: OCA
-   * stringToEnum("OCA");
+   * stringAcasilla("OCA");
    *
    * // Expected output: LABERINTO
-   * stringToEnum("LABERINTO");
+   * stringAcasilla("LABERINTO");
 */
-tCasilla stringToEnum(string str);
+tCasilla stringAcasilla(string str);
 
 /**
    * Devuelve como string simplificado el valor del enum proporcionado
    * @example
    * // Expected output: "OCA"
-   * stringToEnum(OCA);
+   * casillaAstring(OCA);
    *
    * // Expected output: LBRN
-   * stringToEnum(LABERINTO);
+   * casillaAstring(LABERINTO);
 */
 string casillaAstring(tCasilla type);
-string casillaAstringCompleto(tCasilla casilla);
+string casillaAstringCompleto(tCasilla casilla); //Igual a la anterior pero devuelve la string completa -> casillaAstringCompleto(LABERINTO) = "LABERINTO"
 
+//Funciones relacionadas con el manejo de partidas en el array tListaPartidas.
 void eliminarPartida(tListaPartidas& partidas, int indice);
 bool insertaNuevaPartida(tListaPartidas& partidas, const tEstadoPartida& partidaOca);
 
+//Guardado del tablero usado y las posiciones de los jugadores y turno actual.
 void guardaTablero(const tTablero tablero, ofstream& archivo);
 void guardaJugadores(const tEstadoJugadores jugadores, ofstream& archivo);
 void guardaPartidas(const tListaPartidas& partidas);
 
-/**
-   * Pide por pantalla el nombre del fichero para abrir y devuelve un boolean conforme se pudo abrir o no
-*/
-void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo);
-void cargaTablero(tTablero tablero, ifstream& archivo);
-bool cargaPartidas(tListaPartidas& partidas);
 
 
 //-------------------------------------------------------------------------
@@ -212,7 +176,6 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 //---------------------------------------------------------------------------
 
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas);
-void inicializacionPartidaNueva(tEstadoPartida& partidaNueva);
 int jugarPartidaNueva(tListaPartidas& partidas,tEstadoPartida& partidaNueva);
 char menuSeleccionPartida(bool partidasCargadasChecker);
 
@@ -224,6 +187,7 @@ int main() {
 
 	bool partidasCargadasChecker = cargaPartidas(listaPartidas);
 	char seleccionPartida = menuSeleccionPartida(partidasCargadasChecker);
+
 	if (partidasCargadasChecker && (seleccionPartida == 'e')) {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
 		int ganador = partida(listaPartidas.partidas[partidaSeleccionada - 1]);
@@ -323,7 +287,7 @@ void cargaTablero(tTablero tablero, ifstream& archivo) {
 		archivo >> numCasilla;
 		while (numCasilla != CENTINELA) {
 			archivo >> tipoCasilla;
-			if (numCasilla <= NUM_CASILLAS) tablero[numCasilla - 1] = stringToEnum(tipoCasilla);
+			if (numCasilla <= NUM_CASILLAS) tablero[numCasilla - 1] = stringAcasilla(tipoCasilla);
 			archivo >> numCasilla;
 		}
 	}
@@ -546,47 +510,45 @@ int partida(tEstadoPartida& estado) {
 	bool continuarPartida = true, ganado = false;
 	char caracterContinuarPartida;
 	pintaTablero(estado);
-	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.turno  << " ****" << endl;
+	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.turno << " ****" << endl;
 	while (!esMeta(estado.estadoJug[estado.turno - 1].casilla) && continuarPartida) {
-		int penalizacion = estado.estadoJug[estado.turno - 1].penalizaciones;
-		if (!penalizacion) {
-			do {
-				tirada(estado.tablero, estado.estadoJug[estado.turno - 1]);
-				pintaTablero(estado);
-			} while (esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno - 1].casilla) && !esMeta(estado.estadoJug[estado.turno - 1].casilla));
-
-			if (!esMeta(estado.estadoJug[estado.turno - 1].casilla)) {
+		if (estado.estadoJug[estado.turno - 1].penalizaciones == 0 && !esMeta(estado.estadoJug[estado.turno - 1].casilla)) {
+			tirada(estado.tablero, estado.estadoJug[estado.turno - 1]);
+			pintaTablero(estado);
+			if (!esMeta(estado.estadoJug[estado.turno - 1].casilla) && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno - 1].casilla)) {
 				cambioTurno(estado.turno);
 			}
-			else ganado = true;
+			else if (esMeta(estado.estadoJug[estado.turno - 1].casilla)) ganado = true;
 		}
 		else {
-			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
+			cout << "... PERO NO PUEDE " << (estado.estadoJug[estado.turno - 1].penalizaciones > 1 ? "Y LE QUEDAN " + to_string(estado.estadoJug[estado.turno - 1].penalizaciones) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
 			estado.estadoJug[estado.turno - 1].penalizaciones -= 1;
 			cambioTurno(estado.turno);
 		}
-		if (!ganado) {
-			cout << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
+		
+		if (!ganado && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno - 1].casilla)) {
+			cout << endl << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
 			cin >> caracterContinuarPartida;
 			if (caracterContinuarPartida == 'A' || caracterContinuarPartida == 'a') continuarPartida = false;
 		}
 		
+
 	}
 	if (continuarPartida) {
-		cout << "** FIN DEL JUEGO **" << endl; 
+		cout << "** FIN DEL JUEGO **" << endl;
 		pintaTablero(estado);
 	}
 	else cout << "PARTIDA SIN ACABAR" << endl;
-	
+
 	return continuarPartida ? estado.turno : PARTIDA_NO_FINALIZADA; // se devuelve el jugador que ha ganado la partida (ya sin tener en cuenta la posicion del array (0 -> 1, 1 -> 2, etc.))
 }
 
 void cambioTurno(int& jugadorActivo) {
-	jugadorActivo = (jugadorActivo  % NUM_JUGADORES) + 1;
+	jugadorActivo = (jugadorActivo % NUM_JUGADORES) + 1;
 	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
 }
 
-tCasilla stringToEnum(string str) {
+tCasilla stringAcasilla(string str) {
 	tCasilla newEnum = NORMAL;
 	if (str == "OCA") newEnum = OCA;
 	else if (str == "PUENTE1") newEnum = PUENTE1;
@@ -691,8 +653,6 @@ void pintaTablero(const tEstadoPartida& partida) {
 
 	pintaBorde(casillasPorFila);
 	cout << endl;
-
-
 }
 
 // y sus auxiliares
@@ -735,5 +695,4 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 		cout << "|";
 	}
 	cout << endl;
-
 }
