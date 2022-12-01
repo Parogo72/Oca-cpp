@@ -146,6 +146,7 @@ int main() {
 	char opcion;
 	bool tableroAbierto = true;
 	if (listaPartidas.contador < 1) opcion = 'N';
+	else if(listaPartidas.contador == MAX_PARTIDAS) opcion = 'E';
 	else opcion = menuTipoPartida();
 
 	if (toupper(opcion) == 'E') {
