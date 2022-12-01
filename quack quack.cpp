@@ -31,6 +31,7 @@ typedef enum {
 	LABERINTO, DADO1, DADO2, CARCEL, CALAVERA
 } tCasilla;
 
+//Tablero de juego.
 typedef tCasilla tTablero[NUM_CASILLAS];
 
 //Estructura de cada jugador.
@@ -58,7 +59,6 @@ struct tListaPartidas {
 	int contador = 0;
 };
 
-//Tablero de juego.
 
 
 
