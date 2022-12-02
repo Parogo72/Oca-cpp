@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -16,7 +16,6 @@ const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
-const int NUM_JUGADORES = 2; //Elegir aquí el numero de jugadores con los que quieres jugar.
 const int NUM_JUGADORES_MAX = 4;
 const int MAX_PARTIDAS = 10;
 const int CENTINELA = 0;
@@ -37,10 +36,10 @@ struct tEstadoJugador {
 	int penalizacion = 0;
 };
 
-typedef tEstadoJugador tEstadoJugadores[NUM_JUGADORES];
+typedef tEstadoJugador tEstadoJugadores[NUM_JUGADORES_MAX];
 
 struct tAjustesPartida {
-	int numJugadores = 2;
+	int numJugadores;
 	tTablero tablero;
 	string nombreTablero = "tableroClasico63Casillas.txt";
 	string nombrePartidas = "partidas.txt";
@@ -50,7 +49,6 @@ struct tEstadoPartida {
 	tEstadoJugadores jugadores;
 	tAjustesPartida ajustes;
 	int jugadorActivo = 0;
-	int numJugadores;
 	int index;
 };
 
@@ -77,8 +75,9 @@ bool validarTablero(const tTablero tablero);
 int tirarDado();
 int tirarDadoManual();
 bool esMeta(int casilla);
-int quienEmpieza();
-void cambioTurno(int& jugadorActivo);
+int quienEmpieza(const tEstadoPartida& partida);
+
+void cambioTurno(tEstadoPartida& partida);
 
 
 // Subprogramas para configurar el tablero heredados de la v2
@@ -119,13 +118,13 @@ void pintaFilaBlanco(int casillasPorFila);
 void pintaNumCasilla(int fila, int casillasPorFila);
 void pintaBorde(int casillasPorFila);
 void pintaTipoCasilla(const tTablero tablero, int fila, int casillasPorFila);
-void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFila); // NUEVO PROTOTIPO EN V3; SUSTITUYE A  void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila);
+void pintaJugadores(const tEstadoPartida partida, int fila, int casillasPorFila); // NUEVO PROTOTIPO EN V3; SUSTITUYE A  void pintaJugadores(const tJugadores casillasJ, int fila, int casillasPorFila);
 
 char menuTipoPartida();
 
 int menuIncial();
 int menuNumeroPartida(const tListaPartidas listaPartidas);
-void iniciaPartida(tEstadoPartida& estadoPartida);
+void iniciaPartida(tEstadoPartida& estadoPartida, tAjustesPartida ajustes);
 /**
    * Devuelve como enum el valor de la string proporcionada
    * @example
@@ -156,9 +155,9 @@ void pantallaAjustes(tAjustesPartida& ajustes);
 void pantallaNuevaPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas);
 void pantallaListaPartidas(tAjustesPartida& ajustes, tListaPartidas& listaPartidas);
 void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas);
-void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas & listaPartidas, int index);
+void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas, int index);
 void pantallaSobreescribirPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index);
-void pantallaBorrarPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index);
+void pantallaBorrarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index);
 void setupInicial(tAjustesPartida& ajustes);
 void guardarAjustes(tAjustesPartida ajustes);
 
@@ -182,7 +181,7 @@ int main() {
 			pantallaAjustes(ajustesPartida);
 		}
 	} while (opcionMenu != 4);
-	
+
 	guardaPartidas(ajustesPartida, listaPartidas);
 
 	return 0;
@@ -251,8 +250,8 @@ int tirarDadoManual() {
 	return valorDado;
 }
 
-int quienEmpieza() {
-	return rand() % (NUM_JUGADORES);
+int quienEmpieza(const tEstadoPartida& partida) {
+	return rand() % (partida.ajustes.numJugadores);
 }
 
 int saltaACasilla(const tTablero tablero, int casillaActual) {
@@ -290,15 +289,14 @@ int partida(tEstadoPartida& estado) {
 			} while (esCasillaPremio(estado.ajustes.tablero, estado.jugadores[estado.jugadorActivo].posicion) && !esMeta(estado.jugadores[estado.jugadorActivo].posicion));
 
 			if (!esMeta(estado.jugadores[estado.jugadorActivo].posicion)) {
-				cambioTurno(estado.jugadorActivo);
+				cambioTurno(estado);
 			}
 		}
 		else {
 			cout << "... PERO NO PUEDE " << (penalizacion > 1 ? "Y LE QUEDAN " + to_string(penalizacion) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
 			estado.jugadores[estado.jugadorActivo].penalizacion -= 1;
-			cambioTurno(estado.jugadorActivo);
+			cambioTurno(estado);
 		}
-		pintaTablero(estado);
 		char seguir;
 		if (!esMeta(estado.jugadores[estado.jugadorActivo].posicion)) {
 			cout << endl << "Quieres seguir jugando? Y/N" << endl;
@@ -410,7 +408,7 @@ void pintaTablero(const tEstadoPartida& partida) {
 		pintaBorde(casillasPorFila);
 		pintaNumCasilla(fila, casillasPorFila);
 		pintaTipoCasilla(partida.ajustes.tablero, fila, casillasPorFila);
-		pintaJugadores(partida.jugadores, fila, casillasPorFila);
+		pintaJugadores(partida, fila, casillasPorFila);
 	}
 
 	pintaBorde(casillasPorFila);
@@ -465,16 +463,16 @@ void pintaTipoCasilla(const tTablero tablero, int fila, int casillasPorFila) {
 	cout << "|" << endl;
 }
 
-void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFila) {
+void pintaJugadores(const tEstadoPartida partida, int fila, int casillasPorFila) {
 	int casilla;
-	int blancos = 4 - NUM_JUGADORES;
+	int blancos = 4 - partida.ajustes.numJugadores;
 	string b = "";
 	for (int i = 0; i < blancos; i++) b = b + " ";
 	cout << "|";
 	for (int i = 1; i <= casillasPorFila; i++) {
 		casilla = i - 1 + fila * casillasPorFila;
-		for (int jug = 0; jug < NUM_JUGADORES; jug++) {
-			if (estadosJ[jug].posicion == casilla)
+		for (int jug = 0; jug < partida.ajustes.numJugadores; jug++) {
+			if (partida.jugadores[jug].posicion == casilla)
 				cout << jug + 1;
 			else
 				cout << " ";
@@ -508,13 +506,14 @@ int menuNumeroPartida(const tListaPartidas listaPartidas) {
 	return numPartida;
 }
 
-void iniciaPartida(tEstadoPartida& estadoPartida) {
-	estadoPartida.numJugadores = estadoPartida.ajustes.numJugadores;
-	iniciaJugadores(estadoPartida.jugadores, estadoPartida.numJugadores);
-	estadoPartida.jugadorActivo = quienEmpieza();
+void iniciaPartida(tEstadoPartida& estadoPartida, tAjustesPartida ajustes) {
+
+	estadoPartida.ajustes = ajustes;
+	iniciaJugadores(estadoPartida.jugadores, estadoPartida.ajustes.numJugadores);
+	estadoPartida.jugadorActivo = quienEmpieza(estadoPartida);
 }
 
-
+	
 void iniciaJugadores(tEstadoJugadores jugadores, int numJugadores) {
 	for (int i = 0; i < numJugadores; i++) {
 		jugadores[i].posicion = 0;
@@ -529,9 +528,9 @@ void iniciaTablero(tTablero tablero) {
 	tablero[NUM_CASILLAS - 1] = OCA;
 }
 
-void cambioTurno(int& jugadorActivo) {
-	jugadorActivo = (jugadorActivo + 1) % NUM_JUGADORES;
-	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo + 1 << endl;
+void cambioTurno(tEstadoPartida& partida) {
+	partida.jugadorActivo = (partida.jugadorActivo + 1) % partida.ajustes.numJugadores;
+	cout << endl << "TURNO PARA EL JUGADOR " << partida.jugadorActivo + 1 << endl;
 }
 
 bool cargaPartidas(tAjustesPartida ajustes, tListaPartidas& partidas) {
@@ -578,7 +577,7 @@ void cargaJugadores(tEstadoPartida& partida, ifstream& archivo) {
 		archivo >> pos;
 		i++;
 	}
-	partida.numJugadores = i;
+	partida.ajustes.numJugadores = i;
 }
 
 void eliminarPartida(tListaPartidas& partidas, int indice) {
@@ -590,8 +589,8 @@ void eliminarPartida(tListaPartidas& partidas, int indice) {
 
 void insertaNuevaPartida(tListaPartidas& partidas, tEstadoPartida& partidaOca) {
 	if (partidas.contador < MAX_PARTIDAS) {
-		partidas.partidas[partidas.contador] = partidaOca;
 		partidaOca.index = partidas.contador;
+		partidas.partidas[partidas.contador] = partidaOca;
 		partidas.contador++;
 	}
 }
@@ -626,7 +625,7 @@ void guardaTablero(const tTablero tablero, ofstream& archivo) {
 }
 
 void guardaJugadores(const tEstadoPartida partida, ofstream& archivo) {
-	for (int i = 0; i < partida.numJugadores; i++) {
+	for (int i = 0; i < partida.ajustes.numJugadores; i++) {
 		archivo << partida.jugadores[i].posicion << " " << partida.jugadores[i].penalizacion << "\n";
 	}
 	archivo << CENTINELA_JUGADORES << "\n";
@@ -801,13 +800,13 @@ void pantallaNuevaPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartida
 	} while (tolower(choice) != 'y' && tolower(choice) != 'n');
 	if (tolower(choice) == 'y') {
 		tEstadoPartida estadoPartida;
-		estadoPartida.ajustes = ajustes;
-		iniciaPartida(estadoPartida);
+		iniciaPartida(estadoPartida, ajustes);
 		int ganador = partida(estadoPartida);
 		if (ganador == -1) {
 			Clear();
 			pantallaGuardarPartida(estadoPartida, listaPartidas);
-		} else {
+		}
+		else {
 			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 			char salir;
 			do {
@@ -831,7 +830,7 @@ void pantallaListaPartidas(tAjustesPartida& ajustes, tListaPartidas& listaPartid
 	else {
 		do {
 			for (int i = 0; i < listaPartidas.contador; i++) {
-				cout << i + 1 << ".- " << "JUGADORES: " << listaPartidas.partidas[i].numJugadores << "   TURNO: " << listaPartidas.partidas[i].jugadorActivo + 1 << endl;
+				cout << i + 1 << ".- " << "JUGADORES: " << listaPartidas.partidas[i].ajustes.numJugadores << "   TURNO: " << listaPartidas.partidas[i].jugadorActivo + 1 << endl;
 			}
 			cout << listaPartidas.contador + 1 << ".- Salir" << endl;
 			cout << endl << "Selecciona una partida para mas informacion: " << endl;
@@ -848,12 +847,12 @@ void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& lista
 	int choice;
 	do {
 		for (int i = 0; i < listaPartidas.contador; i++) {
-			cout << i + 1 << ".- " << "JUGADORES: " << listaPartidas.partidas[i].numJugadores << "   TURNO: " << listaPartidas.partidas[i].jugadorActivo + 1;
+			cout << i + 1 << ".- " << "JUGADORES: " << listaPartidas.partidas[i].ajustes.numJugadores << "   TURNO: " << listaPartidas.partidas[i].jugadorActivo + 1;
 			if (estadoPartida.index == i) cout << " (Partida Actual)";
 			cout << endl;
 		}
-		if(listaPartidas.contador < MAX_PARTIDAS) cout << listaPartidas.contador + 1 << ".- CREAR UN NUEVO GUARDADO" << endl;
-		cout << listaPartidas.contador + 2 << ".- No guardar la partida" << endl;
+		if (listaPartidas.contador < MAX_PARTIDAS) cout << listaPartidas.contador + 1 << ".- CREAR UN NUEVO GUARDADO" << endl;
+		cout <<  listaPartidas.contador + (listaPartidas.contador >= MAX_PARTIDAS ?  1 : 2 )<< ".- No guardar la partida" << endl;
 		cout << endl << "Selecciona la partida a sobreescribir: " << endl;
 		cin >> choice;
 		Clear();
@@ -861,13 +860,13 @@ void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& lista
 	if (choice <= listaPartidas.contador) {
 		pantallaSobreescribirPartida(estadoPartida, listaPartidas, choice - 1);
 	}
-	else if(choice != MAX_PARTIDAS + 1) {
+	else if (choice != MAX_PARTIDAS + 1) {
 		insertaNuevaPartida(listaPartidas, estadoPartida);
 		guardaPartidas(estadoPartida.ajustes, listaPartidas);
-	}	
+	}
 }
 
-void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartidas, int index) {
+void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida estadoPartida = listaPartidas.partidas[index];
 	int choice;
 	do {
@@ -897,7 +896,7 @@ void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartid
 			} while (tolower(salir) != 'e');
 		}
 	}
-	else if(choice == 2) {
+	else if (choice == 2) {
 		pantallaBorrarPartida(estadoPartida, listaPartidas, index);
 	}
 	else {
@@ -906,7 +905,7 @@ void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartid
 
 }
 
-void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index) {
+void pantallaSobreescribirPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida partidaSobreescribir = listaPartidas.partidas[index];
 	char choice;
 	do {
@@ -914,7 +913,7 @@ void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas
 		cout << "Tablero: ";
 		pintaTablero(partidaSobreescribir);
 		cout << "Turno actual: " << partidaSobreescribir.jugadorActivo + 1 << endl;
-		
+
 		cout << endl << "Estas seguro de sobreescribir esta partida? (Y/N)" << endl;
 		cin >> choice;
 		Clear();
@@ -928,7 +927,7 @@ void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas
 	}
 }
 
-void pantallaBorrarPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index) {
+void pantallaBorrarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida partidaBorrar = listaPartidas.partidas[index];
 	char choice;
 	do {
@@ -957,6 +956,7 @@ void setupInicial(tAjustesPartida& ajustes) {
 	else {
 		ofstream archivo;
 		bool valido = false;
+		ajustes.numJugadores = 2;
 		archivo.open("config.txt");
 		iniciaTablero(ajustes.tablero);
 		valido = cargaTablero(ajustes.tablero, ajustes.nombreTablero);
