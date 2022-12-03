@@ -154,7 +154,7 @@ void guardaPartidas(const tListaPartidas& partidas);
 
 //-------------------------------------------------------------------------
 // Subprogramas para pintar el tablero o mostrar informaci�n
-void pintaTablero(const tEstadoPartida& partida); 
+void pintaTablero(const tEstadoPartida& partida);
 // y sus auxiliares
 void pintaNumCasilla(int fila, int casillasPorFila);
 void pintaBorde(int casillasPorFila);
@@ -164,23 +164,23 @@ void pintaJugadores(const tEstadoJugadores estadosJ, int fila, int casillasPorFi
 //---------------------------------------------------------------------------
 
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas);
-int jugarPartidaNueva(tListaPartidas& partidas,tEstadoPartida& partidaNueva);
+int jugarPartidaNueva(tListaPartidas& partidas, tEstadoPartida& partidaNueva);
 char menuSeleccionPartida(bool partidasCargadasChecker);
 
 
 int main() {
 	srand(time(NULL));
 	tListaPartidas listaPartidas;
-	tEstadoPartida partidaNueva{};	
+	tEstadoPartida partidaNueva;
 
 	bool partidasCargadasChecker = cargaPartidas(listaPartidas);
 	char seleccionPartida = menuSeleccionPartida(partidasCargadasChecker);
 
-	if (partidasCargadasChecker && (seleccionPartida == 'e')) {
+	if (seleccionPartida == 'e') {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
 		int ganador = partida(listaPartidas.partidas[partidaSeleccionada - 1]);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
-			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n" << endl;
+			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl << endl;
 			cout << "La partida " << partidaSeleccionada << " ha terminado. Se elimina de la lista de partidas. ";
 			eliminarPartida(listaPartidas, partidaSeleccionada);
 
@@ -188,10 +188,10 @@ int main() {
 		guardaPartidas(listaPartidas);
 	}
 	else {
-		if (seleccionPartida != 'n') cout << "No se pudo abrir el archivo con las partidas cargadas. \n";
+		if (!partidasCargadasChecker) cout << "No se pudo abrir el archivo con las partidas cargadas." << endl;
 		int ganador = jugarPartidaNueva(listaPartidas, partidaNueva);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
-			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n";
+			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl;
 		}
 		else {
 			if (insertaNuevaPartida(listaPartidas, partidaNueva)) {
@@ -215,7 +215,7 @@ char menuSeleccionPartida(bool partidasCargadasChecker) {
 			if ((seleccionPartida != 'n') && (seleccionPartida != 'e')) cout << "Seleccion no identificada, intentelo de nuevo." << endl;
 		} while ((seleccionPartida != 'n') && (seleccionPartida != 'e'));
 	}
-	else seleccionPartida = 0; //Si no han cargado correctamente, se devuelve un 0.
+	else seleccionPartida = 'n'; // se inciara una nueva partida directamente
 	return seleccionPartida;
 }
 
@@ -226,9 +226,15 @@ void inicializacionPartidaNueva(tEstadoPartida& partidaNueva) {
 	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
 	cin >> nombreArchivo;
 	archivo.open(nombreArchivo);
-	cargaTablero(partidaNueva.tablero, archivo);
-	iniciaJugadores(partidaNueva.estadoJug);
-	partidaNueva.turno = quienEmpieza();
+	if (archivo.is_open()) {
+		cargaTablero(partidaNueva.tablero, archivo);
+		iniciaJugadores(partidaNueva.estadoJug);
+		partidaNueva.turno = quienEmpieza();
+		archivo.close();
+	}
+	else {
+		cout << "No pude abrir el archivo" << endl;
+	}
 }
 
 int jugarPartidaNueva(tListaPartidas& partidas, tEstadoPartida& partidaNueva) {
@@ -239,11 +245,11 @@ int jugarPartidaNueva(tListaPartidas& partidas, tEstadoPartida& partidaNueva) {
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 	int partidaSeleccionada;
 	cout << "Los identificadoes disponibles son: ";
-	for (int i = 1; i <= partidas.contador; i++) { cout << i << " "; }
+	for (int i = 1; i <= partidas.contador; i++) cout << i << " ";
 	cout << endl << "Que partida quieres continuar? ";
 	cin >> partidaSeleccionada;
-	while ( 1 > partidaSeleccionada || partidas.contador < partidaSeleccionada ) {
-		cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n"; 
+	while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador) {
+		cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
 		for (int i = 1; i <= partidas.contador; i++) { cout << i << " "; }
 		cout << endl << "Que partida quieres continuar? ";
 		cin >> partidaSeleccionada;
@@ -252,11 +258,9 @@ int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 }
 
 void iniciaJugadores(tEstadoJugadores jugadores) {
-	tEstadoJugador jugadorAux;
-	jugadorAux.casilla = 0;
-	jugadorAux.penalizaciones = 0;
 	for (int i = 0; i < NUM_JUGADORES; i++) {
-		jugadores[i] = jugadorAux;
+		jugadores[i].casilla = 0;
+		jugadores[i].penalizaciones = 0;
 	}
 }
 
@@ -284,8 +288,8 @@ void cargaTablero(tTablero tablero, ifstream& archivo) {
 void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo) {
 	for (int i = 0; i < NUM_JUGADORES; i++) {
 		archivo >> jugadores[i].casilla;
-		archivo >> jugadores[i].penalizaciones ;
-		jugadores[i].casilla--;
+		archivo >> jugadores[i].penalizaciones;
+		jugadores[i].casilla--; //Se vuelve un numero del 0 al NUM_CASILLAS - 1, para su correcta representacion en pintaTablero, y para facilitar su posicion en tTablero.
 	}
 }
 
@@ -303,6 +307,7 @@ bool cargaPartidas(tListaPartidas& partidas) {
 		for (int i = 0; i < partidas.contador; i++) {
 			cargaTablero(partidas.partidas[i].tablero, archivo);
 			archivo >> partidas.partidas[i].turno;
+			partidas.partidas[i].turno--; // Se pone el turno teniendo en cuenta el indice del array.
 			cargaJugadores(partidas.partidas[i].estadoJug, archivo);
 		}
 		archivo.close();
@@ -321,8 +326,10 @@ void guardaTablero(const tTablero tablero, ofstream& archivo) {
 }
 
 void guardaJugadores(const tEstadoJugadores jugadores, ofstream& archivo) {
+	int casillaSinIndice;
 	for (int i = 0; i < NUM_JUGADORES; i++) {
-		archivo << jugadores[i].casilla + 1 << " " << jugadores[i].penalizaciones << endl;
+		casillaSinIndice = jugadores[i].casilla + 1; //Se convierte la casilla del jugador dependiente del array tablero, a una casilla del 1 al NUM_CASILLAS.
+		archivo << casillaSinIndice << " " << jugadores[i].penalizaciones << endl;
 	}
 }
 
@@ -333,10 +340,12 @@ void guardaPartidas(const tListaPartidas& partidas) {
 	cin >> nombre;
 	archivo.open(nombre);
 	if (archivo.is_open()) {
+		int turnoSinIndice;
 		archivo << partidas.contador << endl;
 		for (int i = 0; i < partidas.contador; i++) {
 			guardaTablero(partidas.partidas[i].tablero, archivo);
-			archivo << partidas.partidas[i].turno << endl;
+			turnoSinIndice = partidas.partidas[i].turno + 1; //Se convierte el indice del array que indica el turno en un valor de 1 a NUM_JUGADORES.
+			archivo << turnoSinIndice << endl;
 			guardaJugadores(partidas.partidas[i].estadoJug, archivo);
 		}
 		archivo.close();
@@ -377,7 +386,7 @@ int tirarDadoManual() {
 }
 
 int quienEmpieza() {
-	return 1 + (rand() % (NUM_JUGADORES));
+	return rand() % NUM_JUGADORES;
 }
 
 bool esMeta(int casilla) {
@@ -391,21 +400,11 @@ bool esCasillaPremio(const tTablero tablero, int casilla) {
 
 int saltaACasilla(const tTablero tablero, int casillaActual) {
 	tCasilla casillaTablero = tablero[casillaActual];
-	if (casillaTablero == OCA) {
-		buscaCasillaAvanzando(tablero, OCA, casillaActual);
-	}
-	else if (casillaTablero == DADO1) {
-		buscaCasillaAvanzando(tablero, DADO2, casillaActual);
-	}
-	else if (casillaTablero == PUENTE1) {
-		buscaCasillaAvanzando(tablero, PUENTE2, casillaActual);
-	}
-	else if (casillaTablero == DADO2) {
-		buscaCasillaRetrocediendo(tablero, DADO1, casillaActual);
-	}
-	else if (casillaTablero == PUENTE2) {
-		buscaCasillaRetrocediendo(tablero, PUENTE1, casillaActual);
-	}
+	if (casillaTablero == OCA)			buscaCasillaAvanzando(tablero, OCA, casillaActual);
+	else if (casillaTablero == DADO1)	buscaCasillaAvanzando(tablero, DADO2, casillaActual);
+	else if (casillaTablero == PUENTE1) buscaCasillaAvanzando(tablero, PUENTE2, casillaActual);
+	else if (casillaTablero == DADO2)	buscaCasillaRetrocediendo(tablero, DADO1, casillaActual);
+	else if (casillaTablero == PUENTE2) buscaCasillaRetrocediendo(tablero, PUENTE1, casillaActual);
 	return casillaActual;
 }
 
@@ -495,45 +494,43 @@ void tirada(const tTablero tablero, tEstadoJugador& estadoJug) {
 }
 
 int partida(tEstadoPartida& estado) {
-	bool continuarPartida = true, ganado = false;
+	bool partidaPausada = false, ganado = false;
 	char caracterContinuarPartida;
 	pintaTablero(estado);
-	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.turno << " ****" << endl;
-	while (!esMeta(estado.estadoJug[estado.turno - 1].casilla) && continuarPartida) {
-		if (estado.estadoJug[estado.turno - 1].penalizaciones == 0 && !esMeta(estado.estadoJug[estado.turno - 1].casilla)) {
-			tirada(estado.tablero, estado.estadoJug[estado.turno - 1]);
+	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.turno + 1 << " ****" << endl;
+	while (!esMeta(estado.estadoJug[estado.turno].casilla) && !partidaPausada) {
+		if (estado.estadoJug[estado.turno].penalizaciones == 0 && !esMeta(estado.estadoJug[estado.turno].casilla)) {
+			tirada(estado.tablero, estado.estadoJug[estado.turno]);
 			pintaTablero(estado);
-			if (!esMeta(estado.estadoJug[estado.turno - 1].casilla) && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno - 1].casilla)) {
+			if (!esMeta(estado.estadoJug[estado.turno].casilla) && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno].casilla)) {
 				cambioTurno(estado.turno);
 			}
-			else if (esMeta(estado.estadoJug[estado.turno - 1].casilla)) ganado = true;
+			else if (esMeta(estado.estadoJug[estado.turno].casilla)) ganado = true;
 		}
 		else {
-			cout << "... PERO NO PUEDE " << (estado.estadoJug[estado.turno - 1].penalizaciones > 1 ? "Y LE QUEDAN " + to_string(estado.estadoJug[estado.turno - 1].penalizaciones) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
-			estado.estadoJug[estado.turno - 1].penalizaciones -= 1;
+			cout << "... PERO NO PUEDE " << (estado.estadoJug[estado.turno].penalizaciones > 1 ? "Y LE QUEDAN " + to_string(estado.estadoJug[estado.turno].penalizaciones) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
+			estado.estadoJug[estado.turno].penalizaciones -= 1;
 			cambioTurno(estado.turno);
 		}
-		
-		if (!ganado && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno - 1].casilla)) {
+
+		if (!ganado && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno].casilla)) {
 			cout << endl << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
 			cin >> caracterContinuarPartida;
-			if (caracterContinuarPartida == 'A' || caracterContinuarPartida == 'a') continuarPartida = false;
+			if (tolower(caracterContinuarPartida) == 'a') partidaPausada = true;
 		}
-		
-
 	}
-	if (continuarPartida) {
+	if (!partidaPausada) {
 		cout << "** FIN DEL JUEGO **" << endl;
 		pintaTablero(estado);
 	}
 	else cout << "PARTIDA SIN ACABAR" << endl;
 
-	return continuarPartida ? estado.turno : PARTIDA_NO_FINALIZADA; // se devuelve el jugador que ha ganado la partida (ya sin tener en cuenta la posicion del array (0 -> 1, 1 -> 2, etc.))
+	return partidaPausada ? PARTIDA_NO_FINALIZADA : estado.turno + 1; // se devuelve el jugador que ha ganado la partida (ya sin tener en cuenta la posicion del array (0 -> 1, 1 -> 2, etc.))
 }
 
 void cambioTurno(int& jugadorActivo) {
-	jugadorActivo = (jugadorActivo % NUM_JUGADORES) + 1;
-	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo << endl;
+	jugadorActivo = (jugadorActivo + 1) % NUM_JUGADORES;
+	cout << endl << "TURNO PARA EL JUGADOR " << jugadorActivo + 1 << endl;
 }
 
 tCasilla stringAcasilla(string str) {
