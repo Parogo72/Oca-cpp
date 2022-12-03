@@ -171,16 +171,16 @@ char menuSeleccionPartida(bool partidasCargadasChecker);
 int main() {
 	srand(time(NULL));
 	tListaPartidas listaPartidas;
-	tEstadoPartida partidaNueva{};	
+	tEstadoPartida partidaNueva;	
 
 	bool partidasCargadasChecker = cargaPartidas(listaPartidas);
 	char seleccionPartida = menuSeleccionPartida(partidasCargadasChecker);
 
-	if (partidasCargadasChecker && (seleccionPartida == 'e')) {
+	if (seleccionPartida == 'e') {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
 		int ganador = partida(listaPartidas.partidas[partidaSeleccionada - 1]);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
-			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n" << endl;
+			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl << endl;
 			cout << "La partida " << partidaSeleccionada << " ha terminado. Se elimina de la lista de partidas. ";
 			eliminarPartida(listaPartidas, partidaSeleccionada);
 
@@ -188,10 +188,10 @@ int main() {
 		guardaPartidas(listaPartidas);
 	}
 	else {
-		if (seleccionPartida == 'e') cout << "No se pudo abrir el archivo con las partidas cargadas. \n";
+		if (!partidasCargadasChecker) cout << "No se pudo abrir el archivo con las partidas cargadas." << endl;
 		int ganador = jugarPartidaNueva(listaPartidas, partidaNueva);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
-			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------\n\n";
+			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl;
 		}
 		else {
 			if (insertaNuevaPartida(listaPartidas, partidaNueva)) {
@@ -215,7 +215,7 @@ char menuSeleccionPartida(bool partidasCargadasChecker) {
 			if ((seleccionPartida != 'n') && (seleccionPartida != 'e')) cout << "Seleccion no identificada, intentelo de nuevo." << endl;
 		} while ((seleccionPartida != 'n') && (seleccionPartida != 'e'));
 	}
-	else seleccionPartida = 0; //Si no han cargado correctamente, se devuelve un 0.
+	else seleccionPartida = 'n'; // se inciara una nueva partida directamente
 	return seleccionPartida;
 }
 
@@ -502,7 +502,7 @@ int partida(tEstadoPartida& estado) {
 	pintaTablero(estado);
 	cout << endl << "**** EMPIEZA EL JUGADOR " << estado.turno << " ****" << endl;
 	int indexTurno = estado.turno - 1;
-	while (!esMeta(estado.estadoJug[indexTurno].casilla) && continuarPartida) {
+	while (!esMeta(estado.estadoJug[indexTurno].casilla) && !partidaPausada) {
 		if (estado.estadoJug[indexTurno].penalizaciones == 0 && !esMeta(estado.estadoJug[indexTurno].casilla)) {
 			tirada(estado.tablero, estado.estadoJug[indexTurno]);
 			pintaTablero(estado);
