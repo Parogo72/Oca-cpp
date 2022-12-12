@@ -271,17 +271,19 @@ int main() {
 	srand(time(NULL));
 	tListaPartidas listaPartidas;
 	tEstadoPartida partidaNueva;
+
 	char seleccionPartida = 'n';
 
 	if (cargaPartidas(listaPartidas)) seleccionPartida = menuSeleccionPartida();
 
 	if (seleccionPartida == 'e') {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
-		int ganador = partida(listaPartidas.partidas[partidaSeleccionada]);
+		int ganador = partida(listaPartidas.partidas[partidaSeleccionada - 1]);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
 			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl << endl;
 			cout << "La partida " << partidaSeleccionada << " ha terminado. Se elimina de la lista de partidas. ";
 			eliminarPartida(listaPartidas, partidaSeleccionada);
+
 		}
 		guardaPartidas(listaPartidas);
 	}
@@ -316,24 +318,22 @@ char menuSeleccionPartida() {
 
 void inicializacionPartidaNueva(tEstadoPartida& partidaNueva) {
 	cout << "Vas a jugar una partida nueva." << endl;
-	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
 	string nombreArchivo;
 	ifstream archivo;
+	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
 	cin >> nombreArchivo;
-	archivo.open(nombreArchivo); 
-	iniciaTablero(partidaNueva.tablero); //sea cual sea el tablero, primero se inicia y luego se añaden las casillas especiales.
+	archivo.open(nombreArchivo);
 	if (archivo.is_open()) {
 		cargaTablero(partidaNueva.tablero, archivo);
+		iniciaJugadores(partidaNueva.estadoJug);
+		partidaNueva.turno = quienEmpieza();
 		archivo.close();
 	}
 	else {
 		cout << "No pude abrir el archivo" << endl;
 	}
-
-	iniciaJugadores(partidaNueva.estadoJug);
-	partidaNueva.turno = quienEmpieza();
 }
-	
+
 int jugarPartidaNueva(tEstadoPartida& partidaNueva) {
 	inicializacionPartidaNueva(partidaNueva);
 	return partida(partidaNueva);
@@ -341,16 +341,17 @@ int jugarPartidaNueva(tEstadoPartida& partidaNueva) {
 
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 	int partidaSeleccionada;
-	do {
-		cout << "Los identificadoes disponibles son: ";
-		for (int i = 1; i <= partidas.contador; i++) cout << i << " ";
+	cout << "Los identificadoes disponibles son: ";
+	for (int i = 1; i <= partidas.contador; i++) cout << i << " ";
+	cout << endl << "Que partida quieres continuar? ";
+	cin >> partidaSeleccionada;
+	while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador) {
+		cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
+		for (int i = 1; i <= partidas.contador; i++) { cout << i << " "; }
 		cout << endl << "Que partida quieres continuar? ";
 		cin >> partidaSeleccionada;
-		if (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador) {
-			cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
-		}
-	} while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador);
-	return partidaSeleccionada - 1;
+	}
+	return partidaSeleccionada;
 }
 
 void iniciaJugadores(tEstadoJugadores jugadores) {
@@ -364,17 +365,21 @@ void iniciaTablero(tTablero tablero) {
 	for (int i = 0; i < NUM_CASILLAS; i++) {
 		tablero[i] = NORMAL;
 	}
+	tablero[NUM_CASILLAS - 1] = OCA;
 }
 void cargaTablero(tTablero tablero, ifstream& archivo) {
-	int numCasilla;
-	string tipoCasilla;
-	archivo >> numCasilla;
-	while (numCasilla != CENTINELA) {
-		archivo >> tipoCasilla;
-		if (numCasilla <= NUM_CASILLAS) tablero[numCasilla - 1] = stringAcasilla(tipoCasilla);
+	bool valido = archivo.is_open();
+	if (valido) {
+		iniciaTablero(tablero); //sea cual sea el tablero, primero se inicia y luego se añaden las casillas especiales.
+		int numCasilla;
+		string tipoCasilla;
 		archivo >> numCasilla;
+		while (numCasilla != CENTINELA) {
+			archivo >> tipoCasilla;
+			if (numCasilla <= NUM_CASILLAS) tablero[numCasilla - 1] = stringAcasilla(tipoCasilla);
+			archivo >> numCasilla;
+		}
 	}
-	tablero[NUM_CASILLAS - 1] = OCA;
 }
 
 void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo) {
@@ -388,14 +393,12 @@ void cargaJugadores(tEstadoJugadores& jugadores, ifstream& archivo) {
 bool cargaPartidas(tListaPartidas& partidas) {
 	ifstream archivo;
 	string name;
-	bool valido = false;
 
+	bool valido = false;
 	cout << "Nombre del archivo que contiene las partidas: ";
 	cin >> name;
-
 	archivo.open(name);
 	valido = archivo.is_open();
-
 	if (valido) {
 		archivo >> partidas.contador;
 		for (int i = 0; i < partidas.contador; i++) {
@@ -454,7 +457,7 @@ void guardaPartidas(const tListaPartidas& partidas) {
 }
 
 void eliminarPartida(tListaPartidas& partidas, int indice) {
-	for (int i = indice; i < partidas.contador - 1; i++) {
+	for (int i = indice - 1; i < partidas.contador; i++) {
 		partidas.partidas[i] = partidas.partidas[i + 1];
 	}
 	partidas.contador--;
@@ -583,12 +586,7 @@ void tirada(const tTablero tablero, tEstadoJugador& estadoJug) {
 	cout << "INTRODUCE EL VALOR DEL DADO: ";
 	int valorDado = (MODO_DEBUG ? tirarDadoManual() : tirarDado());
 	cout << "VALOR DEL DADO: " << valorDado << endl;
-	if (estadoJug.casilla + valorDado >= NUM_CASILLAS) {
-		estadoJug.casilla = NUM_CASILLAS - 1;
-	}
-	else {
-		estadoJug.casilla += valorDado;
-	}
+	estadoJug.casilla += valorDado;
 	cout << "PASAS A LA CASILLA " << estadoJug.casilla + 1 << endl;
 	if (!esMeta(estadoJug.casilla)) {
 		efectoTirada(tablero, estadoJug);
