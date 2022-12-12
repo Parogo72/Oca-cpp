@@ -341,17 +341,16 @@ int jugarPartidaNueva(tEstadoPartida& partidaNueva) {
 
 int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 	int partidaSeleccionada;
-	cout << "Los identificadoes disponibles son: ";
-	for (int i = 1; i <= partidas.contador; i++) cout << i << " ";
-	cout << endl << "Que partida quieres continuar? ";
-	cin >> partidaSeleccionada;
-	while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador) {
-		cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
-		for (int i = 1; i <= partidas.contador; i++) { cout << i << " "; }
+	do {
+		cout << "Los identificadoes disponibles son: ";
+		for (int i = 1; i <= partidas.contador; i++) cout << i << " ";
 		cout << endl << "Que partida quieres continuar? ";
 		cin >> partidaSeleccionada;
-	}
-	return partidaSeleccionada;
+		if (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador) {
+			cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
+		}
+	} while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador);
+	return partidaSeleccionada - 1;
 }
 
 void iniciaJugadores(tEstadoJugadores jugadores) {
@@ -367,10 +366,11 @@ void iniciaTablero(tTablero tablero) {
 	}
 	tablero[NUM_CASILLAS - 1] = OCA;
 }
+
 void cargaTablero(tTablero tablero, ifstream& archivo) {
 	bool valido = archivo.is_open();
+	iniciaTablero(tablero); //sea cual sea el tablero, primero se inicia y luego se añaden las casillas especiales. Aunque sea un tablero no valido para evitar crashes.
 	if (valido) {
-		iniciaTablero(tablero); //sea cual sea el tablero, primero se inicia y luego se añaden las casillas especiales.
 		int numCasilla;
 		string tipoCasilla;
 		archivo >> numCasilla;
@@ -586,7 +586,12 @@ void tirada(const tTablero tablero, tEstadoJugador& estadoJug) {
 	cout << "INTRODUCE EL VALOR DEL DADO: ";
 	int valorDado = (MODO_DEBUG ? tirarDadoManual() : tirarDado());
 	cout << "VALOR DEL DADO: " << valorDado << endl;
-	estadoJug.casilla += valorDado;
+	if (estadoJug.casilla + valorDado >= NUM_CASILLAS) {
+		estadoJug.casilla = NUM_CASILLAS - 1;
+	}
+	else {
+		estadoJug.casilla += valorDado;
+	}
 	cout << "PASAS A LA CASILLA " << estadoJug.casilla + 1 << endl;
 	if (!esMeta(estadoJug.casilla)) {
 		efectoTirada(tablero, estadoJug);
