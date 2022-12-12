@@ -393,11 +393,10 @@ bool cargaPartidas(tListaPartidas& partidas) {
 	ifstream archivo;
 	string name;
 
-	bool valido = false;
 	cout << "Nombre del archivo que contiene las partidas: ";
 	cin >> name;
 	archivo.open(name);
-	valido = archivo.is_open();
+	bool valido = archivo.is_open();
 	if (valido) {
 		archivo >> partidas.contador;
 		for (int i = 0; i < partidas.contador; i++) {
