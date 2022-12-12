@@ -454,7 +454,7 @@ void guardaPartidas(const tListaPartidas& partidas) {
 }
 
 void eliminarPartida(tListaPartidas& partidas, int indice) {
-	for (int i = indice; i < partidas.contador; i++) {
+	for (int i = indice; i < partidas.contador - 1; i++) {
 		partidas.partidas[i] = partidas.partidas[i + 1];
 	}
 	partidas.contador--;
