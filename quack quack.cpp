@@ -274,7 +274,7 @@ int main() {
 
 	char seleccionPartida = 'n';
 
-	if (cargaPartidas(listaPartidas)) seleccionPartida = menuSeleccionPartida();
+	if (cargaPartidas(listaPartidas) && listaPartidas.contador > 0) seleccionPartida = menuSeleccionPartida();
 
 	if (seleccionPartida == 'e') {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
@@ -368,9 +368,8 @@ void iniciaTablero(tTablero tablero) {
 }
 
 void cargaTablero(tTablero tablero, ifstream& archivo) {
-	bool valido = archivo.is_open();
 	iniciaTablero(tablero); //sea cual sea el tablero, primero se inicia y luego se añaden las casillas especiales. Aunque sea un tablero no valido para evitar crashes.
-	if (valido) {
+	if (archivo.is_open()) {
 		int numCasilla;
 		string tipoCasilla;
 		archivo >> numCasilla;
@@ -413,7 +412,7 @@ bool cargaPartidas(tListaPartidas& partidas) {
 	else {
 		cout << "No se pudo abrir el archivo con las partidas cargadas." << endl;
 	}
-	return valido ? partidas.contador : false;
+	return valido;
 }
 
 void guardaTablero(const tTablero tablero, ofstream& archivo) {
@@ -500,10 +499,10 @@ bool esCasillaPremio(const tTablero tablero, int casilla) {
 
 int saltaACasilla(const tTablero tablero, int casillaActual) {
 	tCasilla casillaTablero = tablero[casillaActual];
-	if (casillaTablero == OCA)			buscaCasillaAvanzando(tablero, OCA, casillaActual);
-	else if (casillaTablero == DADO1)	buscaCasillaAvanzando(tablero, DADO2, casillaActual);
+	if (casillaTablero == OCA) buscaCasillaAvanzando(tablero, OCA, casillaActual);
+	else if (casillaTablero == DADO1) buscaCasillaAvanzando(tablero, DADO2, casillaActual);
 	else if (casillaTablero == PUENTE1) buscaCasillaAvanzando(tablero, PUENTE2, casillaActual);
-	else if (casillaTablero == DADO2)	buscaCasillaRetrocediendo(tablero, DADO1, casillaActual);
+	else if (casillaTablero == DADO2) buscaCasillaRetrocediendo(tablero, DADO1, casillaActual);
 	else if (casillaTablero == PUENTE2) buscaCasillaRetrocediendo(tablero, PUENTE1, casillaActual);
 	return casillaActual;
 }
