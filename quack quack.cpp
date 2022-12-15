@@ -111,6 +111,9 @@ int jugarPartidaNueva(tEstadoPartida& partidaNueva);
 */
 int partida(tEstadoPartida& estado);
 
+//TODO: comentario god pls xd
+void pausarPartida(bool& partidaPausada);
+
 /**
 	* Devuelve el jugador que empezará la partida.
 	* @return {int} - Devuelve un número aleatorio entre 0 y NUM_JUGADORES - 1 que indica el jugador que empezará la partida.
@@ -350,7 +353,7 @@ int seleccionadorPartidasExistentes(const tListaPartidas& partidas) {
 			cout << "\nSeleccion no valida, elija uno de los identificadores mostrados. \n";
 		}
 	} while (partidaSeleccionada < 1 || partidaSeleccionada > partidas.contador);
-	return partidaSeleccionada - 1;
+	return partidaSeleccionada;
 }
 
 void iniciaJugadores(tEstadoJugadores jugadores) {
@@ -605,10 +608,11 @@ int partida(tEstadoPartida& estado) {
 		if (estado.estadoJug[estado.turno].penalizaciones == 0 && !esMeta(estado.estadoJug[estado.turno].casilla)) {
 			tirada(estado.tablero, estado.estadoJug[estado.turno]);
 			pintaTablero(estado);
-			if (!esMeta(estado.estadoJug[estado.turno].casilla) && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno].casilla)) {
+			if (esMeta(estado.estadoJug[estado.turno].casilla)) ganado = true;
+
+			else if (!esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno].casilla)) {
 				cambioTurno(estado.turno);
 			}
-			else if (esMeta(estado.estadoJug[estado.turno].casilla)) ganado = true;
 		}
 		else {
 			cout << "... PERO NO PUEDE " << (estado.estadoJug[estado.turno].penalizaciones > 1 ? "Y LE QUEDAN " + to_string(estado.estadoJug[estado.turno].penalizaciones) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
@@ -617,9 +621,7 @@ int partida(tEstadoPartida& estado) {
 		}
 
 		if (!ganado && !esCasillaPremio(estado.tablero, estado.estadoJug[estado.turno].casilla)) {
-			cout << endl << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
-			cin >> caracterContinuarPartida;
-			if (tolower(caracterContinuarPartida) == 'a') partidaPausada = true;
+			pausarPartida(partidaPausada);
 		}
 	}
 	if (!partidaPausada) {
@@ -629,6 +631,13 @@ int partida(tEstadoPartida& estado) {
 	else cout << "PARTIDA SIN ACABAR" << endl;
 
 	return partidaPausada ? PARTIDA_NO_FINALIZADA : estado.turno + 1; // se devuelve el jugador que ha ganado la partida (ya sin tener en cuenta la posicion del array (0 -> 1, 1 -> 2, etc.))
+}
+
+void pausarPartida(bool& partidaPausada) {
+	char caracterContinuarPartida;
+	cout << endl << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
+	cin >> caracterContinuarPartida;
+	if (tolower(caracterContinuarPartida) == 'a') partidaPausada = true;
 }
 
 void cambioTurno(int& jugadorActivo) {
