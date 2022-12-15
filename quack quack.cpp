@@ -111,9 +111,6 @@ int jugarPartidaNueva(tEstadoPartida& partidaNueva);
 */
 int partida(tEstadoPartida& estado);
 
-//TODO: comentario god pls xd
-void pausarPartida(bool& partidaPausada);
-
 /**
 	* Devuelve el jugador que empezará la partida.
 	* @return {int} - Devuelve un número aleatorio entre 0 y NUM_JUGADORES - 1 que indica el jugador que empezará la partida.
@@ -262,6 +259,12 @@ void iniciaTablero(tTablero tablero);
 	* @param {tEstadoJugador} estadoJug - Una estructura que representa el estado de un jugador.
 */
 void tirada(const tTablero tablero, tEstadoJugador& estadoJug);
+
+/**
+ 	* Actualiza la variable para decidir si se sigue la partida o se pausa.
+ 	* @param {bool} partidaPausada - Una variable booleana que indica si la partida se pausará o no.
+*/
+void pausarPartida(bool& partidaPausada);
 
 // Funciones de pintar tablero
 void pintaBorde(int casillasPorFila);
