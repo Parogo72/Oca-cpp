@@ -16,7 +16,7 @@ const int TURNOS_POZO = 3;
 const int PENALIZACION_LABERINTO = 12;
 const int DADO_MAXIMO = 6;
 const int DADO_MINIMO = 1;
-const int NUM_JUGADORES = 2; //Elegir aquí el numero de jugadores con los que quieres jugar.
+const int NUM_JUGADORES = 4; //Elegir aquí el numero de jugadores con los que quieres jugar.
 const int NUM_JUGADORES_MAX = 4;
 const int MAX_PARTIDAS = 10;
 const int CENTINELA = 0;
@@ -24,6 +24,9 @@ const int PARTIDA_NO_FINALIZADA = -1;
 const int NUM_FILAS = 3;
 const int NUM_COLUMNAS = NUM_CASILLAS / NUM_FILAS;
 const bool MODO_DEBUG = true;
+const char PAUSAR_PARTIDA = 'a';
+const char PARTIDA_NUEVA = 'n';
+const char PARTIDA_EXISTENTE = 'e';
 
 //Casillas especiales
 typedef enum {
@@ -91,7 +94,7 @@ bool insertaNuevaPartida(tListaPartidas& partidas, const tEstadoPartida& partida
 
 /**
 	* Muestra un menú al usuario para seleccionar una partida nueva o existente y devuelve la selección del usuario.
-	* @return {char} El caracter ingresado por el usuario, 'n' para partida nueva o 'e' para partida existente.
+	* @return {char} El caracter ingresado por el usuario, PARTIDA_NUEVA para partida nueva o PARTIDA_EXISTENTE para partida existente.
 */
 char menuSeleccionPartida();
 
@@ -261,8 +264,8 @@ void iniciaTablero(tTablero tablero);
 void tirada(const tTablero tablero, tEstadoJugador& estadoJug);
 
 /**
- 	* Actualiza la variable para decidir si se sigue la partida o se pausa.
- 	* @param {bool} partidaPausada - Una variable booleana que indica si la partida se pausará o no.
+	* Actualiza la variable para decidir si se sigue la partida o se pausa.
+	* @param {bool} partidaPausada - Una variable booleana que indica si la partida se pausará o no.
 */
 void pausarPartida(bool& partidaPausada);
 
@@ -278,18 +281,17 @@ int main() {
 	tListaPartidas listaPartidas;
 	tEstadoPartida partidaNueva;
 
-	char seleccionPartida = 'n';
+	char seleccionPartida = PARTIDA_NUEVA;
 
 	if (cargaPartidas(listaPartidas) && listaPartidas.contador > 0) seleccionPartida = menuSeleccionPartida();
 
-	if (seleccionPartida == 'e') {
+	if (seleccionPartida == PARTIDA_EXISTENTE) {
 		int partidaSeleccionada = seleccionadorPartidasExistentes(listaPartidas);
 		int ganador = partida(listaPartidas.partidas[partidaSeleccionada - 1]);
 		if (ganador != PARTIDA_NO_FINALIZADA) {
 			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl << endl << endl;
 			cout << "La partida " << partidaSeleccionada << " ha terminado. Se elimina de la lista de partidas. ";
 			eliminarPartida(listaPartidas, partidaSeleccionada);
-
 		}
 		guardaPartidas(listaPartidas);
 	}
@@ -313,11 +315,11 @@ int main() {
 char menuSeleccionPartida() {
 	char seleccionPartida;
 	do {
-		cout << "Desea jugar una partida nueva o existente [N=nueva / E=existente] ";
+		cout << "Desea jugar una partida nueva o existente [" << char(toupper(PARTIDA_NUEVA)) << " = nueva / " << char(toupper(PARTIDA_EXISTENTE)) << " = existente] ";
 		cin >> seleccionPartida;
 		seleccionPartida = tolower(seleccionPartida);
-		if ((seleccionPartida != 'n') && (seleccionPartida != 'e')) cout << "Seleccion no identificada, intentelo de nuevo." << endl;
-	} while ((seleccionPartida != 'n') && (seleccionPartida != 'e'));
+		if ((seleccionPartida != PARTIDA_NUEVA) && (seleccionPartida != PARTIDA_EXISTENTE)) cout << "Seleccion no identificada, intentelo de nuevo." << endl;
+	} while ((seleccionPartida != PARTIDA_NUEVA) && (seleccionPartida != PARTIDA_EXISTENTE));
 
 	return seleccionPartida;
 }
@@ -619,7 +621,7 @@ int partida(tEstadoPartida& estado) {
 		}
 		else {
 			cout << "... PERO NO PUEDE " << (estado.estadoJug[estado.turno].penalizaciones > 1 ? "Y LE QUEDAN " + to_string(estado.estadoJug[estado.turno].penalizaciones) + " TURNOS SIN JUGAR" : "HASTA EL SIGUIENTE TURNO") << endl;
-			estado.estadoJug[estado.turno].penalizaciones -= 1;
+			estado.estadoJug[estado.turno].penalizaciones--;
 			cambioTurno(estado.turno);
 		}
 
@@ -638,9 +640,9 @@ int partida(tEstadoPartida& estado) {
 
 void pausarPartida(bool& partidaPausada) {
 	char caracterContinuarPartida;
-	cout << endl << "Si quieres abandonar pulse la A. Para continuar pulse cualquier otra tecla... ";
+	cout << endl << "Si quieres abandonar pulse la " << char(toupper(PAUSAR_PARTIDA)) << ". Para continuar pulse cualquier otra tecla... ";
 	cin >> caracterContinuarPartida;
-	if (tolower(caracterContinuarPartida) == 'a') partidaPausada = true;
+	if (tolower(caracterContinuarPartida) == PAUSAR_PARTIDA) partidaPausada = true;
 }
 
 void cambioTurno(int& jugadorActivo) {
