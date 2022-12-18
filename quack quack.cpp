@@ -331,10 +331,11 @@ void inicializacionPartidaNueva(tEstadoPartida& partidaNueva) {
 	cout << "Indica el nombre del fichero que contiene el tablero de la oca: ";
 	cin >> nombreArchivo;
 	archivo.open(nombreArchivo);
-	//Se inicializa todo independientemente de si se ha conseguido abrir el archivo o no (en cargaTablero se comprueba si se pudo abrir y se cierra)
+	//Se inicializa todo independientemente de si se ha conseguido abrir el archivo o no (en cargaTablero se comprueba si se pudo abrir)
 	iniciaJugadores(partidaNueva.estadoJug);
 	partidaNueva.turno = quienEmpieza();
 	cargaTablero(partidaNueva.tablero, archivo);
+	archivo.close();
 }
 
 int jugarPartidaNueva(tEstadoPartida& partidaNueva) {
@@ -382,7 +383,6 @@ void cargaTablero(tTablero tablero, ifstream& archivo) {
 			if (numCasilla <= NUM_CASILLAS) tablero[numCasilla - 1] = stringAcasilla(tipoCasilla);
 			archivo >> numCasilla;
 		}
-		archivo.close();
 	}
 	else {
 		cout << "No pude abrir el archivo" << endl;
