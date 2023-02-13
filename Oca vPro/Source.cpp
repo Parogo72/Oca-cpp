@@ -157,10 +157,10 @@ void pantallaAjustes(unordered_map<string, string>& ajustes);
 void pantallaNuevaPartida(unordered_map<string, string>& ajustes, tListaPartidas& listaPartidas);
 void pantallaListaPartidas(tAjustesPartida& ajustes, tListaPartidas& listaPartidas);
 void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas);
-void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas & listaPartidas, int index);
+void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas, int index);
 void pantallaSobreescribirPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index);
 void pantallaEditorTablero(unordered_map<string, string>& ajustes);
-void pantallaBorrarPartida(tEstadoPartida& estadoPartida, tListaPartidas & listaPartidas, int index);
+void pantallaBorrarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index);
 void guardarAjustes(unordered_map<string, string> ajustes);
 void cargaAjustes(unordered_map<string, string>& ajustes);
 void pantallaEditorCasilla(unordered_map<string, string>& ajustes);
@@ -193,7 +193,7 @@ int main() {
 			pantallaAjustes(ajustes);
 		}
 	} while (opcionMenu != 5);
-	
+
 	guardaPartidas(ajustes, listaPartidas);
 
 	return 0;
@@ -699,18 +699,19 @@ void Clear()
 int menuIncial() {
 	int opcion;
 	do {
-		cout << " __                   _____                      " << endl;
-		cout << "/\\ \\                 /\\  __`\\                    " << endl;
-		cout << "\\ \\ \\         __     \\ \\ \\/\\ \\    ___     __     " << endl;
-		cout << " \\ \\ \\  __  /'__`\\    \\ \\ \\ \\ \\  /'___\\ /'__`\\   " << endl;
+		cout << " __                   _____                      "						<< endl;
+		cout << "/\\ \\                 /\\  __`\\                    "					<< endl;
+		cout << "\\ \\ \\         __     \\ \\ \\/\\ \\    ___     __     "				<< endl;
+		cout << " \\ \\ \\  __  /'__`\\    \\ \\ \\ \\ \\  /'___\\ /'__`\\   "			<< endl;
 		cout << "  \\ \\ \\L\\ \\/\\ \\L\\.\\_   \\ \\ \\_\\ \\/\\ \\__//\\ \\L\\.\\_ " << endl;
-		cout << "   \\ \\____/\\ \\__/.\\_\\   \\ \\_____\\ \\____\\ \\__/.\\_\\ " << endl;
-		cout << "    \\/___/  \\/__/\\/_/    \\/_____/\\/____/\\/__/\\/_/" << endl << endl;
-		cout << "1.- Nueva Partida" << endl;
-		cout << "2.- Lista Partidas" << endl;
-		cout << "3.- Editor Tablero" << endl;
-		cout << "4.- Ajustes" << endl;
-		cout << "5.- Salir" << endl;
+		cout << "   \\ \\____/\\ \\__/.\\_\\   \\ \\_____\\ \\____\\ \\__/.\\_\\ "		<< endl;
+		cout << "    \\/___/  \\/__/\\/_/    \\/_____/\\/____/\\/__/\\/_/"				<< endl;
+		cout																			<< endl;
+		cout << "1.- Nueva Partida"														<< endl;
+		cout << "2.- Lista Partidas"													<< endl;
+		cout << "3.- Editor Tablero"													<< endl;
+		cout << "4.- Ajustes"															<< endl;
+		cout << "5.- Salir"																<< endl;
 		cin >> opcion;
 		Clear();
 	} while (opcion > 5 || opcion < 1);
@@ -776,7 +777,8 @@ void pantallaNuevaPartida(unordered_map<string, string>& ajustes, tListaPartidas
 		if (ganador == -1) {
 			Clear();
 			pantallaGuardarPartida(estadoPartida, listaPartidas);
-		} else {
+		}
+		else {
 			cout << endl << "------ GANA EL JUGADOR " << ganador << " ------" << endl;
 			char salir;
 			do {
@@ -821,7 +823,7 @@ void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& lista
 			if (estadoPartida.index == i) cout << " (Partida Actual)";
 			cout << endl;
 		}
-		if(listaPartidas.contador < MAX_PARTIDAS) cout << listaPartidas.contador + 1 << ".- CREAR UN NUEVO GUARDADO" << endl;
+		if (listaPartidas.contador < MAX_PARTIDAS) cout << listaPartidas.contador + 1 << ".- CREAR UN NUEVO GUARDADO" << endl;
 		cout << listaPartidas.contador + 2 << ".- No guardar la partida" << endl;
 		cout << endl << "Selecciona la partida a sobreescribir: " << endl;
 		cin >> choice;
@@ -830,13 +832,13 @@ void pantallaGuardarPartida(tEstadoPartida& estadoPartida, tListaPartidas& lista
 	if (choice <= listaPartidas.contador) {
 		pantallaSobreescribirPartida(estadoPartida, listaPartidas, choice - 1);
 	}
-	else if(choice != MAX_PARTIDAS + 1) {
+	else if (choice != MAX_PARTIDAS + 1) {
 		insertaNuevaPartida(listaPartidas, estadoPartida);
 		guardaPartidas(estadoPartida.ajustes, listaPartidas);
-	}	
+	}
 }
 
-void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartidas, int index) {
+void pantallaInfoPartida(tAjustesPartida& ajustes, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida estadoPartida = listaPartidas.partidas[index];
 	int choice;
 	do {
@@ -866,7 +868,7 @@ void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartid
 			} while (tolower(salir) != 'e');
 		}
 	}
-	else if(choice == 2) {
+	else if (choice == 2) {
 		pantallaBorrarPartida(estadoPartida, listaPartidas, index);
 	}
 	else {
@@ -875,7 +877,7 @@ void pantallaInfoPartida(tAjustesPartida & ajustes, tListaPartidas & listaPartid
 
 }
 
-void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index) {
+void pantallaSobreescribirPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida partidaSobreescribir = listaPartidas.partidas[index];
 	char choice;
 	do {
@@ -883,7 +885,7 @@ void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas
 		cout << "Tablero: ";
 		pintaTablero(partidaSobreescribir);
 		cout << "Turno actual: " << partidaSobreescribir.jugadorActivo + 1 << endl;
-		
+
 		cout << endl << "Estas seguro de sobreescribir esta partida? (Y/N)" << endl;
 		cin >> choice;
 		Clear();
@@ -897,7 +899,7 @@ void pantallaSobreescribirPartida(tEstadoPartida & estadoPartida, tListaPartidas
 	}
 }
 
-void pantallaBorrarPartida(tEstadoPartida & estadoPartida, tListaPartidas & listaPartidas, int index) {
+void pantallaBorrarPartida(tEstadoPartida& estadoPartida, tListaPartidas& listaPartidas, int index) {
 	tEstadoPartida partidaBorrar = listaPartidas.partidas[index];
 	char choice;
 	do {
